@@ -1,3 +1,4 @@
+import { supabase } from '@/supabase'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -11,9 +12,22 @@ const router = createRouter({
     {
       path: '/auth',
       name: 'Auth',
+      meta: { auth: true },
       component: () => import('../pages/Auth.vue'),
     },
   ],
+})
+
+router.beforeEach(async (to, from, next) => {
+  const requireAuth = to.matched.some((record) => !record.meta.auth)
+  const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
+    ?.currentSession?.access_token
+  const { error } = await supabase.auth.api.getUser(token)
+  if (requireAuth && error) {
+    next('/auth')
+  } else {
+    next()
+  }
 })
 
 export default router
