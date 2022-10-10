@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { supabase, getUserData } from '@/supabase'
 
@@ -11,15 +11,22 @@ interface Iuser {
 export const useUserStore = defineStore('user', {
   state: () => {
     const user = ref<Iuser | null>(null)
+    const authStateChange = ref(false)
 
-    const userId = JSON.parse(localStorage.getItem('supabase.auth.token') || '')
-      .currentSession.user.id
+    const userId = ref(
+      JSON.parse(localStorage.getItem('supabase.auth.token') || '')
+        .currentSession.user.id
+    )
 
-    getUserData(userId).then((data) => (user.value = data))
+    getUserData(userId.value).then((data) => (user.value = data))
     supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        user.value = await getUserData(session.user.id)
-      }
+      if (event === 'SIGNED_IN') authStateChange.value = true
+      else authStateChange.value = false
+      userId.value = session?.user?.id
+    })
+
+    watch(authStateChange, async () => {
+      user.value = await getUserData(userId.value)
     })
     return { user }
   },
