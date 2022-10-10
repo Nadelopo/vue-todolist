@@ -5,10 +5,7 @@ import { storeToRefs } from 'pinia'
 
 const { user } = storeToRefs(useUserStore())
 
-const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  console.log(error)
-}
+const signOut = () => supabase.auth.signOut()
 </script>
 
 <template>
