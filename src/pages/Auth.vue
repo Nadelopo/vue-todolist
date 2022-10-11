@@ -19,7 +19,7 @@ const signUp = async () => {
   if (user) {
     await supabase
       .from('Users')
-      .insert([{ id: user.id, email }])
+      .insert([{ id: user.id, email: email.value }])
       .single()
     router.push({ name: 'Home' })
   }

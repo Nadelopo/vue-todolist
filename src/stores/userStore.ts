@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { supabase } from '@/supabase'
 
 export interface Iuser {
   id: string
@@ -13,5 +14,15 @@ export const useUserStore = defineStore('user', {
     const userId = ref('')
 
     return { user, userId }
+  },
+  actions: {
+    async getUserData(userId: string) {
+      const { data } = await supabase
+        .from<Iuser>('Users')
+        .select()
+        .eq('id', userId)
+        .single()
+      return data
+    },
   },
 })

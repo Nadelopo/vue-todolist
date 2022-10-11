@@ -2,9 +2,10 @@
 import { storeToRefs } from 'pinia'
 import { onBeforeMount } from 'vue'
 import { useUserStore } from './stores/userStore'
-import { supabase, getUserData } from './supabase'
+import { supabase } from './supabase'
 
 const { userId, user } = storeToRefs(useUserStore())
+const { getUserData } = useUserStore()
 
 onBeforeMount(async () => {
   const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
@@ -14,8 +15,8 @@ onBeforeMount(async () => {
       const resp = await supabase.auth.api.getUser(token)
       if (resp.user) {
         userId.value = resp.user.id
+        user.value = await getUserData(resp.user.id)
       }
-      user.value = await getUserData(userId.value)
     } catch (err) {
       console.log(err)
     }
