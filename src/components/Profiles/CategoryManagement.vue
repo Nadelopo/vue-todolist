@@ -12,35 +12,20 @@ const newCategory = ref('')
 const { userId } = storeToRefs(useUserStore())
 
 const { categories } = storeToRefs(useCategoriesStore())
-
-const editCategory = async () => {
-  const { error } = await supabase
-    .from<TCategory>('Categories')
-    .insert({ title: newCategory.value, userId: userId.value })
-  if (error) {
-    console.log(error)
-  }
-}
-
-const deleteCategory = async (categoryId: number) => {
-  const { error } = await supabase
-    .from('Categories')
-    .delete()
-    .eq('id', categoryId)
-  if (error) {
-    console.log(error)
-  }
-}
+const { addCategory, deleteFromCategories, updateCategory } =
+  useCategoriesStore()
 
 const changeCategory = ref('')
+const currentCategoryId = ref(0)
 const changeStateCategory = ref(false)
 const change = (id: number, title: string) => {
   changeStateCategory.value = true
   openInput.value = false
   changeCategory.value = title
+  currentCategoryId.value = id
 }
 
-const addCategory = () => {
+const openAddCategory = () => {
   changeStateCategory.value = false
   openInput.value = true
 }
@@ -48,6 +33,48 @@ const addCategory = () => {
 const cancel = () => {
   changeStateCategory.value = false
   openInput.value = false
+  newCategory.value = ''
+  changeCategory.value = ''
+}
+
+const deleteCategory = async (categoryId: number) => {
+  const { data, error } = await supabase
+    .from('Categories')
+    .delete()
+    .eq('id', categoryId)
+  if (data) {
+    console.log(data[0].id)
+    deleteFromCategories(data[0].id)
+  }
+  if (error) {
+    console.log(error)
+  }
+}
+
+const save = async () => {
+  if (changeStateCategory.value) {
+    const { data, error } = await supabase
+      .from<TCategory>('Categories')
+      .update({ title: changeCategory.value })
+      .eq('id', currentCategoryId.value)
+    if (data) {
+      updateCategory(data[0])
+    }
+    if (error) {
+      console.log(error)
+    }
+  } else if (openInput.value) {
+    const { data, error } = await supabase
+      .from<TCategory>('Categories')
+      .insert({ title: newCategory.value, userId: userId.value })
+    if (data) {
+      addCategory(data[0])
+    }
+    if (error) {
+      console.log(error)
+    }
+  }
+  cancel()
 }
 </script>
 
@@ -71,7 +98,7 @@ const cancel = () => {
       </div>
       <button
         class="mbtn mt-6"
-        @click="addCategory"
+        @click="openAddCategory"
         v-if="!openInput && !changeStateCategory"
       >
         добавить категорию
@@ -83,7 +110,7 @@ const cancel = () => {
       <div v-if="openInput || changeStateCategory">
         <button class="mbtn mt-4" @click="cancel">отменить</button>
       </div>
-      <button class="mbtn mt-6" @click="editCategory">сохранить</button>
+      <button class="mbtn mt-6" @click="save">сохранить</button>
     </div>
   </div>
 </template>

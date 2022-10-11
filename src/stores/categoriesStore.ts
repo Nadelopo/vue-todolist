@@ -11,7 +11,7 @@ export type TCategory = {
 
 export const useCategoriesStore = defineStore('categories', {
   state: () => {
-    const categories = ref<TCategory[] | null>(null)
+    const categories = ref<TCategory[]>([])
 
     return { categories }
   },
@@ -24,7 +24,20 @@ export const useCategoriesStore = defineStore('categories', {
       if (error) {
         console.log(error)
       }
-      this.categories = data
+      if (data !== null) {
+        this.categories = data
+      }
+    },
+    addCategory(category: TCategory) {
+      this.categories.push(category)
+    },
+    deleteFromCategories(categoryId: number) {
+      this.categories = this.categories.filter((cat) => cat.id !== categoryId)
+    },
+    updateCategory(category: TCategory) {
+      this.categories = this.categories.map((cat) =>
+        cat.id == category.id ? { ...cat, title: category.title } : cat
+      )
     },
   },
 })

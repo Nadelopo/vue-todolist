@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { PropType } from 'vue'
-// import { onClickOutside } from '@vueuse/core'
+import { onClickOutside } from '@vueuse/core'
 
 defineProps({
   deleteHandler: {
@@ -25,7 +25,7 @@ defineProps({
 const isOpen = ref(false)
 const popupRef = ref<HTMLDivElement>()
 
-// onClickOutside(popupRef, () => (isOpen.value = false))
+onClickOutside(popupRef, () => (isOpen.value = false))
 
 const changePossition = ref(false)
 
