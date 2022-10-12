@@ -37,13 +37,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = null
   }
 })
-
-// supabase
-//   .from('Categories')
-//   .on('*', () => {
-//     setCategories(userId.value)
-//   })
-//   .subscribe()
 </script>
 
 <template>

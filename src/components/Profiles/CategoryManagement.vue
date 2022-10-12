@@ -43,7 +43,6 @@ const deleteCategory = async (categoryId: number) => {
     .delete()
     .eq('id', categoryId)
   if (data) {
-    console.log(data[0].id)
     deleteFromCategories(data[0].id)
   }
   if (error) {
