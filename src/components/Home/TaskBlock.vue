@@ -1,14 +1,33 @@
 <script setup lang="ts">
-import { useCategoriesStore } from '@/stores/categoriesStore'
+import type { TcurrentCategory } from '@/stores/categoriesStore'
+import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+import Popup from '@/components/UI/Popup.vue'
 
-const { categories } = storeToRefs(useCategoriesStore())
+const { tasks } = storeToRefs(useTasksStore())
+const { updateTask, editTaskStatus, deleteTask } = useTasksStore()
+const isInputOpen = ref(false)
+
+const currentChangedTask = ref<TcurrentCategory>({})
+
+const change = (id: number, title: string) => {
+  isInputOpen.value = true
+  currentChangedTask.value = {
+    id,
+    title,
+  }
+}
+
+const saveChanges = async () => {
+  updateTask(currentChangedTask.value)
+}
 </script>
 
 <template>
   <div>
     <div class="wrapper">
-      <template v-for="task in categories" :key="task.id">
+      <template v-for="task in tasks" :key="task.id">
         <div class="task__wrapper">
           <div
             :class="{ text__crossed: task.status }"
@@ -18,13 +37,7 @@ const { categories } = storeToRefs(useCategoriesStore())
               {{ task.title }}
             </div>
 
-            <div class="mr-2">
-              {{
-                calculate(
-                  new Date(task.date.seconds * 1000).toLocaleDateString()
-                )
-              }}
-            </div>
+            <div class="mr-2">date</div>
           </div>
           <div>
             <div class="flex items-center w-14 justify-between">
@@ -33,19 +46,19 @@ const { categories } = storeToRefs(useCategoriesStore())
                   check__off: task.status == false,
                   check__on: task.status == true,
                 }"
-                @click="edit(task)"
+                @click="editTaskStatus(task)"
               ></div>
               <Popup
-                :delete-handler="deleteTask"
                 :id="task.id"
+                :delete-handler="deleteTask"
                 :change="change"
-                :item="task"
+                :title="task.title"
               />
             </div>
           </div>
         </div>
       </template>
-      <div v-if="visibleInput" class="mt-6">
+      <div v-if="isInputOpen" class="mt-6">
         <input type="text" v-model="currentChangedTask.title" />
         <button class="mbtn mt-4" @click="saveChanges">сохранить</button>
       </div>

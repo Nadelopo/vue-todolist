@@ -3,19 +3,18 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { onClickOutside } from '@vueuse/core'
 import Swal from 'sweetalert2'
-// import TaskBlock from '@/components/Home/TaskBlock.vue'
+import TaskBlock from '@/components/Home/TaskBlock.vue'
 import { useUserStore } from '@/stores/userStore'
-import { useCategoriesStore, type TCategory } from '@/stores/categoriesStore'
-import { supabase } from '@/supabase'
-import type { Ttask } from '@/stores/tasksStore'
-
-type TcurrentCategory = {
-  id?: number
-  title?: string
-}
+import {
+  useCategoriesStore,
+  type TCategory,
+  type TcurrentCategory,
+} from '@/stores/categoriesStore'
+import { useTasksStore } from '@/stores/tasksStore'
 
 const { user, userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
+const { addTask } = useTasksStore()
 
 // const open = inject(openKey)
 // const setOpen = inject(setOpenKey, () => null)
@@ -26,36 +25,23 @@ const setOpen = (value: boolean) => (open.value = value)
 const newTask = ref('')
 const currentCategory = ref<TcurrentCategory>({})
 const fromWarning = ref(false)
-const addTask = async (): Promise<void> => {
+const createTask = async (): Promise<void> => {
   if (!currentCategory.value.id || !newTask.value) {
     fromWarning.value = true
     Swal.fire('Заполните поля', '', 'warning')
   } else if (currentCategory.value.id !== null) {
-    const { data, error } = await supabase
-      .from<Ttask>('Tasks')
-      .insert({
-        title: newTask.value,
-        categoryId: currentCategory.value.id,
-        userId: userId.value,
-      })
-      .single()
-    if (error) {
-      console.log(error)
-    }
-    console.log(data)
+    addTask(newTask.value, currentCategory.value.id, userId.value)
+    newTask.value = ''
   }
 }
 
 const activeSelect = ref(false)
-
 const openSelect = () => {
   activeSelect.value = !activeSelect.value
 }
 
 const wrapRef = ref(null)
-onClickOutside(wrapRef, () => {
-  activeSelect.value = false
-})
+onClickOutside(wrapRef, () => (activeSelect.value = false))
 
 const setCurrentCategory = (category: TCategory) => {
   currentCategory.value = {
@@ -118,10 +104,10 @@ const setCurrentCategory = (category: TCategory) => {
             </div>
           </div>
           <div>
-            <button class="mbtn mt-3" @click="addTask">добавить</button>
+            <button class="mbtn mt-3" @click="createTask">добавить</button>
           </div>
         </div>
-        <!-- <TaskBlock :key="1" /> -->
+        <TaskBlock :key="1" />
       </transition-group>
     </div>
   </div>

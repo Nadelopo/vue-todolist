@@ -4,16 +4,16 @@ import type { PropType } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 
 defineProps({
-  deleteHandler: {
-    type: Function as PropType<(id: number) => Promise<void>>,
-    required: true,
-  },
   id: {
     type: Number,
     required: true,
   },
+  deleteHandler: {
+    type: Function as PropType<(id: number) => Promise<void>>,
+    required: true,
+  },
   change: {
-    type: Function,
+    type: Function as PropType<(id: number, title: string) => void>,
     default: () => null,
   },
   title: {
