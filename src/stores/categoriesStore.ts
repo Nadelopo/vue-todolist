@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { supabase } from '@/supabase'
 import { useRoute } from 'vue-router'
@@ -14,9 +14,7 @@ export const useCategoriesStore = defineStore('categories', {
   state: () => {
     const categories = ref<TCategory[]>([])
 
-    const route = useRoute()
-    const currentCategory = computed(() => Number(route.query.category) || null)
-    return { categories, currentCategory }
+    return { categories }
   },
   actions: {
     async setCategories(userId: string) {
@@ -43,5 +41,9 @@ export const useCategoriesStore = defineStore('categories', {
       )
     },
   },
-  getters: {},
+  getters: {
+    currentCategory() {
+      return Number(useRoute().query.category) || null
+    },
+  },
 })
