@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@formkit/auto-animate': 1.0.0-beta.3
   '@rushstack/eslint-patch': ^1.1.4
   '@supabase/supabase-js': ^1.35.7
   '@types/node': ^16.11.56
@@ -26,6 +27,7 @@ specifiers:
   vue-tsc: ^0.40.7
 
 dependencies:
+  '@formkit/auto-animate': 1.0.0-beta.3
   '@supabase/supabase-js': 1.35.7
   '@vueuse/core': 9.3.0_vue@3.2.40
   pinia: 2.0.23_rg374xhldfcyvjtaj3qktyfz5y
@@ -127,6 +129,10 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@formkit/auto-animate/1.0.0-beta.3:
+    resolution: {integrity: sha512-glsi+ytwQpxT/Ctr9GtcIfVr4dO6mJ04mQbNU8MFSdCdqMopHtyfU5Fib0+9lNFIeR0luY4/0NW95/2R5pKsag==}
+    dev: false
 
   /@humanwhocodes/config-array/0.10.7:
     resolution: {integrity: sha512-MDl6D6sBsaV452/QSdX+4CXIjZhIcI0PELsxUjk4U828yd58vk3bTIvk/6w5FY+4hIy9sLW0sfrV7K7Kc++j/w==}

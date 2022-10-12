@@ -7,11 +7,11 @@ import Popup from '@/components/UI/Popup.vue'
 
 const { tasks } = storeToRefs(useTasksStore())
 const { updateTask, editTaskStatus, deleteTask } = useTasksStore()
-const isInputOpen = ref(false)
 
+const isInputOpen = ref(false)
 const currentChangedTask = ref<TcurrentCategory>({})
 
-const change = (id: number, title: string) => {
+const changeTask = (id: number, title: string) => {
   isInputOpen.value = true
   currentChangedTask.value = {
     id,
@@ -21,6 +21,7 @@ const change = (id: number, title: string) => {
 
 const saveChanges = async () => {
   updateTask(currentChangedTask.value)
+  isInputOpen.value = false
 }
 </script>
 
@@ -51,7 +52,7 @@ const saveChanges = async () => {
               <Popup
                 :id="task.id"
                 :delete-handler="deleteTask"
-                :change="change"
+                :change="changeTask"
                 :title="task.title"
               />
             </div>

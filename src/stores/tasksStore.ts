@@ -54,9 +54,7 @@ export const useTasksStore = defineStore('tasks', {
         })
         .single()
       if (error) console.log(error)
-      if (data) {
-        this.tasks.push(data)
-      }
+      if (data) this.getTasks()
     },
     async updateTask(task: TcurrentCategory) {
       if (task.id) {
