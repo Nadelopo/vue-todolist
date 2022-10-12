@@ -7,15 +7,7 @@ import Swal from 'sweetalert2'
 import { useUserStore } from '@/stores/userStore'
 import { useCategoriesStore, type TCategory } from '@/stores/categoriesStore'
 import { supabase } from '@/supabase'
-
-type Ttask = {
-  id: number
-  created_at: Date
-  title: string
-  status: boolean
-  categoryId: number
-  userId: string
-}
+import type { Ttask } from '@/stores/tasksStore'
 
 type TcurrentCategory = {
   id?: number

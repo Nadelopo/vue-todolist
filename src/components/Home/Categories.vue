@@ -1,8 +1,22 @@
 <script setup lang="ts">
 import { useCategoriesStore } from '@/stores/categoriesStore'
+import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const { categories, currentCategory } = storeToRefs(useCategoriesStore())
+const { getTasks } = useTasksStore()
+
+watch(
+  () => route.query.category,
+  (cur) => {
+    currentCategory.value = Number(cur)
+    getTasks()
+  }
+)
 </script>
 
 <template>

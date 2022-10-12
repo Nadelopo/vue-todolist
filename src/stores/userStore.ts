@@ -17,11 +17,14 @@ export const useUserStore = defineStore('user', {
   },
   actions: {
     async getUserData(userId: string) {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from<Iuser>('Users')
         .select()
         .eq('id', userId)
         .single()
+      if (error) {
+        console.log(error)
+      }
       return data
     },
   },

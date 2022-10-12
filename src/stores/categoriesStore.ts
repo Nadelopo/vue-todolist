@@ -1,7 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { supabase } from '@/supabase'
-import { useRoute } from 'vue-router'
 
 export type TCategory = {
   id: number
@@ -13,8 +12,8 @@ export type TCategory = {
 export const useCategoriesStore = defineStore('categories', {
   state: () => {
     const categories = ref<TCategory[]>([])
-
-    return { categories }
+    const currentCategory = ref<number | null>(null)
+    return { categories, currentCategory }
   },
   actions: {
     async setCategories(userId: string) {
@@ -39,11 +38,6 @@ export const useCategoriesStore = defineStore('categories', {
       this.categories = this.categories.map((cat) =>
         cat.id == category.id ? { ...cat, title: category.title } : cat
       )
-    },
-  },
-  getters: {
-    currentCategory() {
-      return Number(useRoute().query.category) || null
     },
   },
 })
