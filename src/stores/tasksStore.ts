@@ -16,7 +16,8 @@ export type Ttask = {
 export const useTasksStore = defineStore('tasks', {
   state: () => {
     const tasks = ref<Ttask[]>([])
-    return { tasks }
+    const allTasks = ref<Ttask[]>([])
+    return { tasks, allTasks }
   },
   actions: {
     async getTasks() {
@@ -95,6 +96,15 @@ export const useTasksStore = defineStore('tasks', {
       if (data) {
         this.tasks = this.tasks.filter((t) => t.id !== id)
       }
+    },
+    async setAllTask() {
+      const { userId } = storeToRefs(useUserStore())
+      const { data, error } = await supabase
+        .from<Ttask>('Tasks')
+        .select()
+        .eq('userId', userId.value)
+      if (error) console.log(error)
+      if (data) this.allTasks = data
     },
   },
 })
