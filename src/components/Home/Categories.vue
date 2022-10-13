@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useCategoriesStore } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
+import { useUserStore } from '@/stores/userStore'
 import { storeToRefs } from 'pinia'
 import { watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -9,18 +10,19 @@ const route = useRoute()
 
 const { categories, currentCategory } = storeToRefs(useCategoriesStore())
 const { getTasks } = useTasksStore()
+const { userId } = storeToRefs(useUserStore())
 
 watch(
   () => route.query.category,
   (cur) => {
     currentCategory.value = Number(cur)
-    getTasks()
+    getTasks(userId.value)
   }
 )
 </script>
 
 <template>
-  <div class="container">
+  <div>
     <div class="flex justify-center">
       <div class="my-3 scrollcategory">
         <div class="flex items-center">

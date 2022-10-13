@@ -16,9 +16,6 @@ const { user, userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
 const { addTask } = useTasksStore()
 
-// const open = inject(openKey)
-// const setOpen = inject(setOpenKey, () => null)
-
 const open = ref(false)
 const setOpen = (value: boolean) => (open.value = value)
 
@@ -52,13 +49,11 @@ const setCurrentCategory = (category: TCategory) => {
 </script>
 
 <template>
-  <div class="container">
+  <div>
     <div class="mb-4 mx-auto">
       <button class="cbtn" @click="setOpen(!open)">
-        <Transition name="fade" mode="out-in">
-          <div v-if="open">закрыть</div>
-          <div v-else>создать</div>
-        </Transition>
+        <div v-if="open">закрыть</div>
+        <div v-else>создать</div>
       </button>
     </div>
     <div>
@@ -73,7 +68,7 @@ const setCurrentCategory = (category: TCategory) => {
               required
             />
           </div>
-          <div class="mb-4 relative">
+          <div class="mb-4 relative z-0">
             <div
               class="select"
               @click="openSelect"
@@ -208,13 +203,4 @@ const setCurrentCategory = (category: TCategory) => {
   opacity: 0
   transition: .3s ease
   transform: scale(0.2)
-
-.fade-enter-active,
-.fade-leave-active
-  transition: 0.3s ease
-
-
-.fade-enter-from,
-.fade-leave-to
-  opacity: 0
 </style>

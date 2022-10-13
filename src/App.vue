@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
 import { onBeforeMount, provide, ref } from 'vue'
 import { useUserStore } from './stores/userStore'
@@ -11,6 +12,7 @@ import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
 const { userId, user } = storeToRefs(useUserStore())
 const { getUserData } = useUserStore()
 const { setCategories } = useCategoriesStore()
+const { getTasks } = useTasksStore()
 
 onBeforeMount(async () => {
   const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
@@ -22,6 +24,7 @@ onBeforeMount(async () => {
         userId.value = resp.user.id
         user.value = await getUserData(resp.user.id)
         setCategories(resp.user.id)
+        getTasks(resp.user.id)
       }
     } catch (err) {
       console.log(err)
@@ -34,6 +37,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     userId.value = session.user.id
     user.value = await getUserData(session.user.id)
     setCategories(session.user.id)
+    getTasks(session.user.id)
   } else {
     userId.value = ''
     user.value = null

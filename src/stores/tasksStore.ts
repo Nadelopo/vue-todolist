@@ -20,8 +20,7 @@ export const useTasksStore = defineStore('tasks', {
     return { tasks, allTasks }
   },
   actions: {
-    async getTasks() {
-      const { userId } = storeToRefs(useUserStore())
+    async getTasks(userId: string) {
       const { currentCategory } = storeToRefs(useCategoriesStore())
       let Data, Error
       if (currentCategory.value) {
@@ -29,7 +28,7 @@ export const useTasksStore = defineStore('tasks', {
           .from<Ttask>('Tasks')
           .select()
           .order('created_at')
-          .eq('userId', userId.value)
+          .eq('userId', userId)
           .eq('categoryId', currentCategory.value)
         Data = data
         Error = error
@@ -38,7 +37,7 @@ export const useTasksStore = defineStore('tasks', {
           .from<Ttask>('Tasks')
           .select()
           .order('created_at')
-          .eq('userId', userId.value)
+          .eq('userId', userId)
         Data = data
         Error = error
       }
@@ -55,7 +54,7 @@ export const useTasksStore = defineStore('tasks', {
         })
         .single()
       if (error) console.log(error)
-      if (data) this.getTasks()
+      if (data) this.getTasks(userId)
     },
     async updateTask(task: TcurrentCategory) {
       if (task.id) {

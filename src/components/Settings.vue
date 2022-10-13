@@ -82,6 +82,7 @@ watch(
   display: flex
   padding: 40px
   font-size: 18px
+  z-index: 100
 
 .li
   border-radius: 8px
