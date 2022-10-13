@@ -38,7 +38,9 @@ const saveChanges = async () => {
               {{ task.title }}
             </div>
 
-            <div class="mr-2">date</div>
+            <div class="mr-2">
+              {{ new Date(task.created_at).toLocaleDateString() }}
+            </div>
           </div>
           <div>
             <div class="flex items-center w-14 justify-between">
