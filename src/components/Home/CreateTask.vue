@@ -11,6 +11,7 @@ import {
   type TcurrentCategory,
 } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
+import TickSVG from '@/assets/icons/tick.svg?component'
 
 const { user, userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
@@ -58,40 +59,36 @@ const setCurrentCategory = (category: TCategory) => {
     </div>
     <div>
       <transition-group name="flip">
-        <div v-if="open" class="wrapper" :key="0">
+        <div v-if="open" :key="0" class="wrapper">
           <div class="mb-4">
             <input
+              v-model="newTask"
               type="text"
               placeholder="название задачи"
               :class="{ form__warning: fromWarning }"
-              v-model="newTask"
               required
             />
           </div>
           <div class="mb-4 relative z-0">
             <div
-              class="select"
-              @click="openSelect"
-              :class="{ active: activeSelect, form__warning: fromWarning }"
               ref="wrapRef"
+              class="select"
+              :class="{ active: activeSelect, form__warning: fromWarning }"
+              @click="openSelect"
             >
               <div>
                 {{ currentCategory.title ?? 'Выберите категорию' }}
               </div>
               <div>
-                <svg xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M9.67861 1.8337L5.77064 5.68539C5.34503 6.10487 4.65497 6.10487 4.22936 5.68539L0.321394 1.8337C-0.365172 1.15702 0.121082 -8.36609e-08 1.09203 0L8.90797 6.7345e-07C9.87892 7.57111e-07 10.3652 1.15702 9.67861 1.8337Z"
-                  />
-                </svg>
+                <TickSVG />
               </div>
             </div>
             <div style="user-select: none">.</div>
-            <div class="list" v-if="user" :class="{ active: activeSelect }">
+            <div v-if="user" class="list" :class="{ active: activeSelect }">
               <div
-                class="li"
                 v-for="category in categories"
                 :key="category.id"
+                class="li"
                 @click="setCurrentCategory(category)"
               >
                 {{ category.title }}

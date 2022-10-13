@@ -81,29 +81,29 @@ const save = async () => {
   <div>
     <div class="font-medium text-lg mb-4">Управление категориями</div>
     <div class="wrapper">
-      <div class="flex flex-col gap-y-4" v-if="categories">
+      <div v-if="categories" class="flex flex-col gap-y-4">
         <div v-for="category in categories" :key="category.id" class="category">
           <div class="shadow__none">{{ category.title }}</div>
           <Popup
-            :delete-handler="deleteCategory"
             :id="category.id"
+            :delete-handler="deleteCategory"
             :change="change"
             :title="category.title"
           />
         </div>
       </div>
       <div v-if="openInput">
-        <input type="text" class="mt-6" v-model="newCategory" />
+        <input v-model="newCategory" type="text" class="mt-6" />
       </div>
       <button
+        v-if="!openInput && !changeStateCategory"
         class="mbtn mt-6"
         @click="openAddCategory"
-        v-if="!openInput && !changeStateCategory"
       >
         добавить категорию
       </button>
       <div v-if="changeStateCategory">
-        <input type="text" class="mt-6" v-model="changeCategory" />
+        <input v-model="changeCategory" type="text" class="mt-6" />
       </div>
 
       <div v-if="openInput || changeStateCategory">

@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import type { TCategory } from '@/stores/categoriesStore'
+import type { Tuser } from '@/stores/userStore'
 import { supabase } from '@/supabase'
+import Swal from 'sweetalert2'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -15,12 +18,27 @@ const signUp = async () => {
   })
   if (error) {
     console.log(error)
+    let message = 'Непредвиденная ошибка'
+    switch (error.status) {
+      case 400:
+        message = 'Пользователь уже зарегистрирован'
+        break
+      case 422:
+        message = 'Пароль должен состоять не менее чем из 6 символов'
+    }
+    Swal.fire(message, '', 'error')
   }
   if (user) {
-    await supabase
-      .from('Users')
+    const { error: insertUser } = await supabase
+      .from<Tuser>('Users')
       .insert([{ id: user.id, email: email.value }])
       .single()
+    const { error: insertCategory } = await supabase
+      .from<TCategory>('Categories')
+      .insert({ title: 'ежедневные', userId: user.id })
+
+    if (insertUser) console.log(insertUser)
+    if (insertCategory) console.log(insertCategory)
     router.push({ name: 'Home' })
   }
 }
@@ -32,6 +50,7 @@ const signIn = async () => {
   })
   if (error) {
     console.log(error)
+    Swal.fire('Данные не верны', '', 'error')
   } else router.push({ name: 'Home' })
 }
 
@@ -54,20 +73,19 @@ const choiceAuth = () => (change.value ? signIn() : signUp())
       <form @submit.prevent="choiceAuth">
         <div class="mb-4">
           <input
-            type="email"
-            class=""
             ref="loginRef"
-            placeholder="почта"
             v-model="email"
+            type="email"
+            placeholder="почта"
             required
           />
         </div>
         <div class="mb-6">
           <input
-            type="password"
-            class=""
-            placeholder="пароль"
             v-model="password"
+            type="password"
+            minlength="6"
+            placeholder="пароль"
             required
           />
         </div>

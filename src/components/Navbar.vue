@@ -18,7 +18,7 @@ const setStateOpenSettings = inject(setIsOpenSettingsKey, () => null)
 </script>
 
 <template>
-  <div class="mb-8 pt-10" v-if="$route.name !== 'Auth'">
+  <div v-if="$route.name !== 'Auth'" class="mb-8 pt-10">
     <div class="container">
       <div class="header">
         <div>

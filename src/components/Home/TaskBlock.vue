@@ -62,7 +62,7 @@ const saveChanges = async () => {
         </div>
       </template>
       <div v-if="isInputOpen" class="mt-6">
-        <input type="text" v-model="currentChangedTask.title" />
+        <input v-model="currentChangedTask.title" type="text" />
         <button class="mbtn mt-4" @click="saveChanges">сохранить</button>
       </div>
     </div>

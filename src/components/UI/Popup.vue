@@ -41,15 +41,15 @@ watch(isOpen, () => {
   <div class="flex flex-column" :class="{ relative: changePossition }">
     <div class="popup" :class="{ active: isOpen }">
       <button class="cbtn" @click="deleteHandler(id)">удалить</button>
-      <button class="cbtn" @click="change(id, title)" v-if="change">
+      <button v-if="change" class="cbtn" @click="change(id, title)">
         изменить
       </button>
     </div>
     <div class="dots__wrapper">
       <div
+        ref="popupRef"
         class="flex flex-col gap-y-0.5 items-center w-4 cursor-pointer"
         @click="isOpen = !isOpen"
-        ref="popupRef"
       >
         <div class="dot"></div>
         <div class="dot"></div>
