@@ -2,6 +2,9 @@
 import { supabase } from '@/supabase'
 import { useRouter } from 'vue-router'
 import SettingSVG from '@/assets/icons/settings.svg?component'
+import { inject } from 'vue'
+import Settings from '@/components/Settings.vue'
+import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
 
 const router = useRouter()
 
@@ -9,6 +12,9 @@ const signOut = async () => {
   await supabase.auth.signOut()
   router.push({ name: 'Auth' })
 }
+
+const stateOpenSettings = inject(isOpenSettingsKey)
+const setStateOpenSettings = inject(setIsOpenSettingsKey, () => null)
 </script>
 
 <template>
@@ -28,14 +34,17 @@ const signOut = async () => {
             <button class="cbtn">задачи</button>
           </router-link>
         </div>
-        <!-- @click="openSettingsHandler" -->
-        <SettingSVG />
+
+        <SettingSVG @click="setStateOpenSettings" />
       </div>
     </div>
   </div>
-  <!-- <transition name="settings"> -->
-  <!-- <Settings v-if="openSettings" :set-open-settings="setOpenSettings" /> -->
-  <!-- </transition> -->
+  <transition name="settings">
+    <Settings
+      v-if="stateOpenSettings"
+      :set-open-settings="setStateOpenSettings"
+    />
+  </transition>
 </template>
 
 <style scoped lang="sass">

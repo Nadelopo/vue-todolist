@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, provide, ref } from 'vue'
 import { useUserStore } from './stores/userStore'
 import { supabase } from './supabase'
 import Navbar from '@/components/Navbar.vue'
 import { useCategoriesStore } from './stores/categoriesStore'
+
+import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
 
 const { userId, user } = storeToRefs(useUserStore())
 const { getUserData } = useUserStore()
@@ -37,6 +39,14 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = null
   }
 })
+
+const isOpenSettings = ref(false)
+provide(isOpenSettingsKey, isOpenSettings)
+
+const setIsOpenSettings = () => {
+  isOpenSettings.value = !isOpenSettings.value
+}
+provide(setIsOpenSettingsKey, setIsOpenSettings)
 </script>
 
 <template>
