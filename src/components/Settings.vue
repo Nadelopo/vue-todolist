@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, type PropType } from 'vue'
 import { onClickOutside } from '@vueuse/core'
-// import Accordion from './UI/Accordion.vue'
+import Accordion from './UI/Accordion.vue'
 
 const props = defineProps({
   setOpenSettings: {
@@ -56,13 +56,13 @@ watch(
             <div class="cursor-pointer" @click="visible = !visible">
               сменить тему
             </div>
-            <!-- <Accordion :visible="visible"> -->
-            <div @click="setTheme('dark')" class="li">темная</div>
-            <div @click="setTheme('light')" class="li">светлая</div>
-            <div @click="setTheme('turquoise')" class="li">бирюзовый</div>
-            <div @click="setTheme('purple')" class="li">фиолетовый</div>
-            <div @click="setTheme('orange')" class="li">ораньжевый</div>
-            <!-- </Accordion> -->
+            <Accordion :visible="visible">
+              <div @click="setTheme('dark')" class="li">темная</div>
+              <div @click="setTheme('light')" class="li">светлая</div>
+              <div @click="setTheme('turquoise')" class="li">бирюзовый</div>
+              <div @click="setTheme('purple')" class="li">фиолетовый</div>
+              <div @click="setTheme('orange')" class="li">ораньжевый</div>
+            </Accordion>
           </div>
         </div>
       </div>
