@@ -46,6 +46,7 @@ const setCurrentCategory = (category: TCategory) => {
     id: category.id,
     title: category.title,
   }
+  activeSelect.value = false
 }
 </script>
 
@@ -66,6 +67,7 @@ const setCurrentCategory = (category: TCategory) => {
               type="text"
               placeholder="название задачи"
               :class="{ form__warning: fromWarning }"
+              class="remove__invalid"
               required
             />
           </div>
@@ -89,7 +91,9 @@ const setCurrentCategory = (category: TCategory) => {
                 v-for="category in categories"
                 :key="category.id"
                 class="li"
+                tabindex="0"
                 @click="setCurrentCategory(category)"
+                @keyup.enter="setCurrentCategory(category)"
               >
                 {{ category.title }}
               </div>
@@ -200,4 +204,8 @@ const setCurrentCategory = (category: TCategory) => {
   opacity: 0
   transition: .3s ease
   transform: scale(0.2)
+
+.remove__invalid
+  &:invalid
+    box-shadow: none
 </style>

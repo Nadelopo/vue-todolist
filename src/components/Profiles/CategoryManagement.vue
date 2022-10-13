@@ -5,6 +5,7 @@ import { supabase } from '@/supabase'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import Popup from '@/components/UI/Popup.vue'
+import Swal from 'sweetalert2'
 
 const openInput = ref(false)
 const newCategory = ref('')
@@ -51,29 +52,33 @@ const deleteCategory = async (categoryId: number) => {
 }
 
 const save = async () => {
-  if (changeStateCategory.value) {
-    const { data, error } = await supabase
-      .from<TCategory>('Categories')
-      .update({ title: changeCategory.value })
-      .eq('id', currentCategoryId.value)
-    if (data) {
-      updateCategory(data[0])
+  if (newCategory.value || changeCategory.value) {
+    if (changeStateCategory.value) {
+      const { data, error } = await supabase
+        .from<TCategory>('Categories')
+        .update({ title: changeCategory.value })
+        .eq('id', currentCategoryId.value)
+      if (data) {
+        updateCategory(data[0])
+      }
+      if (error) {
+        console.log(error)
+      }
+    } else if (openInput.value) {
+      const { data, error } = await supabase
+        .from<TCategory>('Categories')
+        .insert({ title: newCategory.value, userId: userId.value })
+      if (data) {
+        addCategory(data[0])
+      }
+      if (error) {
+        console.log(error)
+      }
     }
-    if (error) {
-      console.log(error)
-    }
-  } else if (openInput.value) {
-    const { data, error } = await supabase
-      .from<TCategory>('Categories')
-      .insert({ title: newCategory.value, userId: userId.value })
-    if (data) {
-      addCategory(data[0])
-    }
-    if (error) {
-      console.log(error)
-    }
+    cancel()
+  } else {
+    Swal.fire('Заполните данные', '', 'warning')
   }
-  cancel()
 }
 </script>
 
@@ -95,13 +100,11 @@ const save = async () => {
       <div v-if="openInput">
         <input v-model="newCategory" type="text" class="mt-6" />
       </div>
-      <button
-        v-if="!openInput && !changeStateCategory"
-        class="mbtn mt-6"
-        @click="openAddCategory"
-      >
-        добавить категорию
-      </button>
+      <div v-if="!openInput && !changeStateCategory">
+        <button class="mbtn mt-6" @click="openAddCategory">
+          добавить категорию
+        </button>
+      </div>
       <div v-if="changeStateCategory">
         <input v-model="changeCategory" type="text" class="mt-6" />
       </div>
