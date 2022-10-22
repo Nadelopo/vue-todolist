@@ -2,7 +2,8 @@ import { ref } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
 import { supabase } from '@/supabase'
 import { useUserStore } from './userStore'
-import { useCategoriesStore, type TcurrentCategory } from './categoriesStore'
+import { useCategoriesStore } from './categoriesStore'
+import type { TcurrentTask } from '@/components/Home/TaskBlock.vue'
 
 export type Ttask = {
   id: number
@@ -21,15 +22,15 @@ export const useTasksStore = defineStore('tasks', {
   },
   actions: {
     async getTasks(userId: string) {
-      const { currentCategory } = storeToRefs(useCategoriesStore())
+      const { currentCategoryId } = storeToRefs(useCategoriesStore())
       let Data, Error
-      if (currentCategory.value) {
+      if (currentCategoryId.value) {
         const { data, error } = await supabase
           .from<Ttask>('Tasks')
           .select()
           .order('created_at')
           .eq('userId', userId)
-          .eq('categoryId', currentCategory.value)
+          .eq('categoryId', currentCategoryId.value)
         Data = data
         Error = error
       } else {
@@ -56,7 +57,7 @@ export const useTasksStore = defineStore('tasks', {
       if (error) console.log(error)
       if (data) this.getTasks(userId)
     },
-    async updateTask(task: TcurrentCategory) {
+    async updateTask(task: TcurrentTask) {
       if (task.id) {
         const { data, error } = await supabase
           .from<Ttask>('Tasks')

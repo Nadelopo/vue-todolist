@@ -5,13 +5,14 @@ import { onClickOutside } from '@vueuse/core'
 import Swal from 'sweetalert2'
 import TaskBlock from '@/components/Home/TaskBlock.vue'
 import { useUserStore } from '@/stores/userStore'
-import {
-  useCategoriesStore,
-  type TCategory,
-  type TcurrentCategory,
-} from '@/stores/categoriesStore'
+import { useCategoriesStore, type TCategory } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
 import TickSVG from '@/assets/icons/tick.svg?component'
+
+export type TcurrentCategory = {
+  id?: number
+  title?: string
+}
 
 const { user, userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
@@ -22,10 +23,10 @@ const setOpen = (value: boolean) => (open.value = value)
 
 const newTask = ref('')
 const currentCategory = ref<TcurrentCategory>({})
-const fromWarning = ref(false)
+const formWarning = ref(false)
 const createTask = async (): Promise<void> => {
   if (!currentCategory.value.id || !newTask.value) {
-    fromWarning.value = true
+    formWarning.value = true
     Swal.fire('Заполните поля', '', 'warning')
   } else if (currentCategory.value.id !== null) {
     addTask(newTask.value, currentCategory.value.id, userId.value)
@@ -54,8 +55,7 @@ const setCurrentCategory = (category: TCategory) => {
   <div>
     <div class="mb-4 mx-auto">
       <button class="cbtn" @click="setOpen(!open)">
-        <div v-if="open">закрыть</div>
-        <div v-else>создать</div>
+        <div>{{ open ? 'закрыть' : 'создать' }}</div>
       </button>
     </div>
     <div>
@@ -66,7 +66,7 @@ const setCurrentCategory = (category: TCategory) => {
               v-model="newTask"
               type="text"
               placeholder="название задачи"
-              :class="{ form__warning: fromWarning }"
+              :class="{ form__warning: formWarning }"
               class="remove__invalid"
               required
             />
@@ -75,7 +75,7 @@ const setCurrentCategory = (category: TCategory) => {
             <div
               ref="wrapRef"
               class="select"
-              :class="{ active: activeSelect, form__warning: fromWarning }"
+              :class="{ active: activeSelect, form__warning: formWarning }"
               @click="openSelect"
             >
               <div>
@@ -111,35 +111,35 @@ const setCurrentCategory = (category: TCategory) => {
 
 <style scoped lang="sass">
 
-.plus, .minus
-  margin-bottom: 10px
-  cursor: pointer
-  border-radius: 100px
-  width: 30px
-  height: 30px
-  background: #1c1c1c
-  border: 2px solid #1c1c1c
-  display: flex
-  justify-content: center
-  align-items: center
-  transition: .4s
-  &::after
-    content: '+'
-    color: #fff
-    font-size: 36px
-    height: 16px
-    display: flex
-    justify-content: center
-    align-items: center
-    transition: .4s
-  &:hover
-    background: #fff
-    &::after
-      color: #1c1c1c
+// .plus, .minus
+//   margin-bottom: 10px
+//   cursor: pointer
+//   border-radius: 100px
+//   width: 30px
+//   height: 30px
+//   background: #1c1c1c
+//   border: 2px solid #1c1c1c
+//   display: flex
+//   justify-content: center
+//   align-items: center
+//   transition: .4s
+//   &::after
+//     content: '+'
+//     color: #fff
+//     font-size: 36px
+//     height: 16px
+//     display: flex
+//     justify-content: center
+//     align-items: center
+//     transition: .4s
+//   &:hover
+//     background: #fff
+//     &::after
+//       color: #1c1c1c
 
-.minus
-  &::after
-    content: '-'
+// .minus
+//   &::after
+//     content: '-'
 
 .select
   position: absolute
@@ -159,7 +159,7 @@ const setCurrentCategory = (category: TCategory) => {
     height: 8px
     fill: var(--color)
   &.active
-     border-radius: 8px 10px 0 0
+    border-radius: 8px 10px 0 0
 
 .list
   position: absolute

@@ -9,16 +9,11 @@ export type TCategory = {
   userId: string
 }
 
-export type TcurrentCategory = {
-  id?: number
-  title?: string
-}
-
 export const useCategoriesStore = defineStore('categories', {
   state: () => {
     const categories = ref<TCategory[]>([])
-    const currentCategory = ref<number | null>(null)
-    return { categories, currentCategory }
+    const currentCategoryId = ref<number | null>()
+    return { categories, currentCategoryId }
   },
   actions: {
     async setCategories(userId: string) {

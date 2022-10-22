@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import type { TcurrentCategory } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 import Popup from '@/components/UI/Popup.vue'
 
+export type TcurrentTask = {
+  id?: number
+  title?: string
+}
+
 const { tasks } = storeToRefs(useTasksStore())
 const { updateTask, editTaskStatus, deleteTask } = useTasksStore()
 
 const isInputOpen = ref(false)
-const currentChangedTask = ref<TcurrentCategory>({})
+const currentChangedTask = ref<TcurrentTask>({})
 
 const changeTask = (id: number, title: string) => {
   isInputOpen.value = true

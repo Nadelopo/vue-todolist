@@ -8,14 +8,14 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-const { categories, currentCategory } = storeToRefs(useCategoriesStore())
+const { categories, currentCategoryId } = storeToRefs(useCategoriesStore())
 const { getTasks } = useTasksStore()
 const { userId } = storeToRefs(useUserStore())
 
 watch(
   () => route.query.category,
   (cur) => {
-    currentCategory.value = Number(cur)
+    currentCategoryId.value = Number(cur)
     getTasks(userId.value)
   }
 )
@@ -28,7 +28,7 @@ watch(
         <div class="flex items-center">
           <router-link
             class="cbtn"
-            :class="{ active: currentCategory == null }"
+            :class="{ active: currentCategoryId == null }"
             :to="{ query: { category: null } }"
           >
             все
@@ -41,7 +41,7 @@ watch(
         >
           <router-link
             class="cbtn"
-            :class="{ active: category.id === currentCategory }"
+            :class="{ active: category.id === currentCategoryId }"
             :to="{ query: { category: category.id } }"
           >
             {{ category.title }}

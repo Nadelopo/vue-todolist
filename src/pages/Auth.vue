@@ -72,13 +72,7 @@ const choiceAuth = () => (change.value ? signIn() : signUp())
       </div>
       <form @submit.prevent="choiceAuth">
         <div class="mb-4">
-          <input
-            ref="loginRef"
-            v-model="email"
-            type="email"
-            placeholder="почта"
-            required
-          />
+          <input v-model="email" type="email" placeholder="почта" required />
         </div>
         <div class="mb-6">
           <input
