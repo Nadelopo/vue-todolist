@@ -20,6 +20,14 @@ export const useTasksStore = defineStore('tasks', {
     const allTasks = ref<Ttask[]>([])
     return { tasks, allTasks }
   },
+  getters: {
+    completedTasks(state) {
+      return state.allTasks.filter((t) => t.status).length
+    },
+    notCompleted(state) {
+      return state.allTasks.filter((t) => !t.status).length
+    },
+  },
   actions: {
     async getTasks(userId: string) {
       const { currentCategoryId } = storeToRefs(useCategoriesStore())
@@ -85,6 +93,7 @@ export const useTasksStore = defineStore('tasks', {
           t.id == task.id ? { ...t, status: data.status } : t
         )
       }
+      this.setAllTask()
     },
     async deleteTask(id: number) {
       const { data, error } = await supabase

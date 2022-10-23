@@ -14,7 +14,7 @@ const route = useRoute()
 const { userId, user } = storeToRefs(useUserStore())
 const { getUserData } = useUserStore()
 const { setCategories } = useCategoriesStore()
-const { getTasks } = useTasksStore()
+const { getTasks, setAllTask } = useTasksStore()
 
 const { currentCategoryId } = storeToRefs(useCategoriesStore())
 
@@ -30,6 +30,7 @@ onBeforeMount(async () => {
         user.value = await getUserData(resp.user.id)
         setCategories(resp.user.id)
         getTasks(resp.user.id)
+        setAllTask()
       }
     } catch (err) {
       console.log(err)
