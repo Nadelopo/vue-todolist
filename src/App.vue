@@ -57,6 +57,9 @@ const setIsOpenSettings = () => {
   isOpenSettings.value = !isOpenSettings.value
 }
 provide(setIsOpenSettingsKey, setIsOpenSettings)
+
+const theme = ref(localStorage.getItem('theme') || 'dark')
+document.documentElement.setAttribute('data-theme', theme.value)
 </script>
 
 <template>

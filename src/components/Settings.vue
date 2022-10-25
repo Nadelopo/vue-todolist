@@ -18,7 +18,6 @@ const visible = ref(false)
 
 const theme = ref(localStorage.getItem('theme') || 'dark')
 const setTheme = (value: string) => (theme.value = value)
-document.documentElement.setAttribute('data-theme', theme.value)
 
 watch(
   () => theme.value,
