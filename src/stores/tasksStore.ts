@@ -31,27 +31,17 @@ export const useTasksStore = defineStore('tasks', {
   actions: {
     async getTasks(userId: string) {
       const { currentCategoryId } = storeToRefs(useCategoriesStore())
-      let Data, Error
+      let request = supabase
+        .from<Ttask>('Tasks')
+        .select()
+        .order('created_at')
+        .eq('userId', userId)
       if (currentCategoryId.value) {
-        const { data, error } = await supabase
-          .from<Ttask>('Tasks')
-          .select()
-          .order('created_at')
-          .eq('userId', userId)
-          .eq('categoryId', currentCategoryId.value)
-        Data = data
-        Error = error
-      } else {
-        const { data, error } = await supabase
-          .from<Ttask>('Tasks')
-          .select()
-          .order('created_at')
-          .eq('userId', userId)
-        Data = data
-        Error = error
+        request = request.eq('categoryId', currentCategoryId.value)
       }
-      if (Error) console.log(Error)
-      if (Data) this.tasks = Data.reverse()
+      const { data, error } = await request
+      if (error) console.log(error)
+      if (data) this.tasks = data.reverse()
     },
     async addTask(title: string, categoryId: number, userId: string) {
       const { data, error } = await supabase
