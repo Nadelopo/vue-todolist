@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
 import { useUserStore } from '@/stores/userStore'
-import { storeToRefs } from 'pinia'
-import { watch } from 'vue'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 

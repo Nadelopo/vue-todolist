@@ -21,23 +21,41 @@ export const useCategoriesStore = defineStore('categories', {
         .from<TCategory>('Categories')
         .select()
         .eq('userId', userId)
-      if (error) {
-        console.log(error)
+      if (error) console.log(error)
+      if (data) this.categories = data
+    },
+    async createCategory(title: string, userId: string) {
+      const { data, error } = await supabase
+        .from<TCategory>('Categories')
+        .insert({ title, userId })
+        .single()
+
+      if (error) console.log(error)
+      if (data) this.categories.push(data)
+    },
+    async updateCategory(title: string, id: number) {
+      const { data, error } = await supabase
+        .from<TCategory>('Categories')
+        .update({ title })
+        .eq('id', id)
+        .single()
+      if (error) console.log(error)
+      if (data) {
+        this.categories = this.categories.map((cat) =>
+          cat.id == data.id ? { ...cat, title: data.title } : cat
+        )
       }
-      if (data !== null) {
-        this.categories = data
+    },
+    async deleteCategory(categoryId: number) {
+      const { data, error } = await supabase
+        .from<TCategory>('Categories')
+        .delete()
+        .eq('id', categoryId)
+        .single()
+      if (error) console.log(error)
+      if (data) {
+        this.categories = this.categories.filter((cat) => cat.id !== data.id)
       }
-    },
-    addCategory(category: TCategory) {
-      this.categories.push(category)
-    },
-    deleteFromCategories(categoryId: number) {
-      this.categories = this.categories.filter((cat) => cat.id !== categoryId)
-    },
-    updateCategory(category: TCategory) {
-      this.categories = this.categories.map((cat) =>
-        cat.id == category.id ? { ...cat, title: category.title } : cat
-      )
     },
   },
 })

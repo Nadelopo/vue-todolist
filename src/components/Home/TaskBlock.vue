@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useTasksStore } from '@/stores/tasksStore'
-import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useTasksStore } from '@/stores/tasksStore'
 import Popup from '@/components/UI/Popup.vue'
 
 export type TcurrentTask = {
@@ -77,14 +77,14 @@ const saveChanges = async () => {
 
 .check__off
   transition: .3s
-  &:hover
-    box-shadow: var(--shadow-focus)
   cursor: pointer
   border-radius: 100px
   width: 30px
   height: 30px
   background: var(--back-main)
   border: 2px solid var(--color)
+  &:hover
+    box-shadow: var(--shadow-focus)
 
 
 .check__on
@@ -117,7 +117,4 @@ hr
   display: flex
   justify-content: space-between
   margin-bottom: 8px
-  // background: var(--back-main)
-  // border-radius: 8px
-  // padding: 4px 6px
 </style>

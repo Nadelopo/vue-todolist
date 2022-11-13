@@ -24,7 +24,7 @@ const setOpen = (value: boolean) => (open.value = value)
 const newTask = ref('')
 const currentCategory = ref<TcurrentCategory>({})
 const formWarning = ref(false)
-const createTask = async (): Promise<void> => {
+const createTask = async () => {
   if (!currentCategory.value.id || !newTask.value) {
     formWarning.value = true
     Swal.fire('Заполните поля', '', 'warning')
@@ -110,36 +110,6 @@ const setCurrentCategory = (category: TCategory) => {
 </template>
 
 <style scoped lang="sass">
-
-// .plus, .minus
-//   margin-bottom: 10px
-//   cursor: pointer
-//   border-radius: 100px
-//   width: 30px
-//   height: 30px
-//   background: #1c1c1c
-//   border: 2px solid #1c1c1c
-//   display: flex
-//   justify-content: center
-//   align-items: center
-//   transition: .4s
-//   &::after
-//     content: '+'
-//     color: #fff
-//     font-size: 36px
-//     height: 16px
-//     display: flex
-//     justify-content: center
-//     align-items: center
-//     transition: .4s
-//   &:hover
-//     background: #fff
-//     &::after
-//       color: #1c1c1c
-
-// .minus
-//   &::after
-//     content: '-'
 
 .select
   position: absolute

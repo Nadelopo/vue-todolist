@@ -24,7 +24,7 @@ export const useTasksStore = defineStore('tasks', {
     completedTasks(state) {
       return state.allTasks.filter((t) => t.status).length
     },
-    notCompleted(state) {
+    notCompletedTasks(state) {
       return state.allTasks.filter((t) => !t.status).length
     },
   },

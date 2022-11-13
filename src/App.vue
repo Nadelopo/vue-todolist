@@ -15,7 +15,6 @@ const { userId, user } = storeToRefs(useUserStore())
 const { getUserData } = useUserStore()
 const { setCategories } = useCategoriesStore()
 const { getTasks, setAllTask } = useTasksStore()
-
 const { currentCategoryId } = storeToRefs(useCategoriesStore())
 
 onBeforeMount(async () => {

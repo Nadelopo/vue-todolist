@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { TCategory } from '@/stores/categoriesStore'
-import type { Tuser } from '@/stores/userStore'
-import { supabase } from '@/supabase'
-import Swal from 'sweetalert2'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2'
+import { supabase } from '@/supabase'
+import type { TCategory } from '@/stores/categoriesStore'
+import type { Tuser } from '@/stores/userStore'
 
 const email = ref('')
 const password = ref('')

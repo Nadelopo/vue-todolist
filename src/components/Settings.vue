@@ -11,10 +11,10 @@ const props = defineProps({
   },
 })
 
+const visible = ref(false)
+
 const contentRef = ref(null)
 onClickOutside(contentRef, () => props.setOpenSettings())
-
-const visible = ref(false)
 
 const theme = ref(localStorage.getItem('theme') || 'dark')
 const setTheme = (value: string) => (theme.value = value)

@@ -22,9 +22,7 @@ export const useUserStore = defineStore('user', {
         .select()
         .eq('id', userId)
         .single()
-      if (error) {
-        console.log(error)
-      }
+      if (error) console.log(error)
       return data
     },
   },

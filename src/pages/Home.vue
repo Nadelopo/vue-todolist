@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useCategoriesStore } from '@/stores/categoriesStore'
-import { storeToRefs } from 'pinia'
 import { useRoute, useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useCategoriesStore } from '@/stores/categoriesStore'
 import Categories from '../components/Home/Categories.vue'
 import CreateTask from '../components/Home/CreateTask.vue'
 

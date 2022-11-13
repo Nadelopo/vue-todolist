@@ -2,7 +2,7 @@
 import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
 
-const { completedTasks, notCompleted } = storeToRefs(useTasksStore())
+const { completedTasks, notCompletedTasks } = storeToRefs(useTasksStore())
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const { completedTasks, notCompleted } = storeToRefs(useTasksStore())
         <div class="text-center">Завершенные задачи</div>
       </div>
       <div class="task__wrapper">
-        <div>{{ notCompleted }}</div>
+        <div>{{ notCompletedTasks }}</div>
         <div class="text-center">Не завершенные задачи</div>
       </div>
     </div>
@@ -25,7 +25,6 @@ const { completedTasks, notCompleted } = storeToRefs(useTasksStore())
 
 .task__wrapper
   flex-direction: column
-  // gap: 6px
   padding: 15px
   display: flex
   justify-content: center

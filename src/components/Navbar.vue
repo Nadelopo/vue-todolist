@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { supabase } from '@/supabase'
-import { useRouter } from 'vue-router'
-import SettingSVG from '@/assets/icons/settings.svg?component'
 import { inject } from 'vue'
-import Settings from '@/components/Settings.vue'
+import { useRouter } from 'vue-router'
+import { supabase } from '@/supabase'
 import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
+import SettingSVG from '@/assets/icons/settings.svg?component'
+import Settings from '@/components/Settings.vue'
 
 const router = useRouter()
 

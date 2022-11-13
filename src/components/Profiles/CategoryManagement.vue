@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import { useCategoriesStore, type TCategory } from '@/stores/categoriesStore'
-import { useUserStore } from '@/stores/userStore'
-import { supabase } from '@/supabase'
-import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
-import Popup from '@/components/UI/Popup.vue'
+import { storeToRefs } from 'pinia'
 import Swal from 'sweetalert2'
-
-const openInput = ref(false)
-const newCategory = ref('')
+import { useCategoriesStore } from '@/stores/categoriesStore'
+import { useUserStore } from '@/stores/userStore'
+import Popup from '@/components/UI/Popup.vue'
 
 const { userId } = storeToRefs(useUserStore())
-
 const { categories } = storeToRefs(useCategoriesStore())
-const { addCategory, deleteFromCategories, updateCategory } =
-  useCategoriesStore()
+const { createCategory, deleteCategory, updateCategory } = useCategoriesStore()
 
+const openInput = ref(false)
 const changeCategory = ref('')
 const currentCategoryId = ref(0)
 const changeStateCategory = ref(false)
+
 const change = (id: number, title: string) => {
   changeStateCategory.value = true
   openInput.value = false
@@ -31,6 +27,8 @@ const openAddCategory = () => {
   openInput.value = true
 }
 
+const newCategory = ref('')
+
 const cancel = () => {
   changeStateCategory.value = false
   openInput.value = false
@@ -38,42 +36,12 @@ const cancel = () => {
   changeCategory.value = ''
 }
 
-const deleteCategory = async (categoryId: number) => {
-  const { data, error } = await supabase
-    .from('Categories')
-    .delete()
-    .eq('id', categoryId)
-  if (data) {
-    deleteFromCategories(data[0].id)
-  }
-  if (error) {
-    console.log(error)
-  }
-}
-
 const save = async () => {
   if (newCategory.value || changeCategory.value) {
     if (changeStateCategory.value) {
-      const { data, error } = await supabase
-        .from<TCategory>('Categories')
-        .update({ title: changeCategory.value })
-        .eq('id', currentCategoryId.value)
-      if (data) {
-        updateCategory(data[0])
-      }
-      if (error) {
-        console.log(error)
-      }
+      updateCategory(changeCategory.value, currentCategoryId.value)
     } else if (openInput.value) {
-      const { data, error } = await supabase
-        .from<TCategory>('Categories')
-        .insert({ title: newCategory.value, userId: userId.value })
-      if (data) {
-        addCategory(data[0])
-      }
-      if (error) {
-        console.log(error)
-      }
+      createCategory(newCategory.value, userId.value)
     }
     cancel()
   } else {
