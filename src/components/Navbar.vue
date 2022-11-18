@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { inject } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '@/supabase'
-import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
 import SettingSVG from '@/assets/icons/settings.svg?component'
 import Settings from '@/components/Settings.vue'
 
@@ -13,8 +12,10 @@ const signOut = async () => {
   router.push({ name: 'Auth' })
 }
 
-const stateOpenSettings = inject(isOpenSettingsKey)
-const setStateOpenSettings = inject(setIsOpenSettingsKey, () => null)
+const isOpenSettings = ref(false)
+const setIsOpenSettings = () => {
+  isOpenSettings.value = !isOpenSettings.value
+}
 </script>
 
 <template>
@@ -35,15 +36,12 @@ const setStateOpenSettings = inject(setIsOpenSettingsKey, () => null)
           </router-link>
         </div>
 
-        <SettingSVG @click="setStateOpenSettings" />
+        <SettingSVG @click="setIsOpenSettings" />
       </div>
     </div>
   </div>
   <transition name="settings">
-    <Settings
-      v-if="stateOpenSettings"
-      :set-open-settings="setStateOpenSettings"
-    />
+    <Settings v-if="isOpenSettings" :set-open-settings="setIsOpenSettings" />
   </transition>
 </template>
 

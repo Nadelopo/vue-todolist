@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { useTasksStore } from '@/stores/tasksStore'
 import { storeToRefs } from 'pinia'
-import { onBeforeMount, provide, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import { useUserStore } from './stores/userStore'
 import { supabase } from './supabase'
 import Navbar from '@/components/Navbar.vue'
 import { useCategoriesStore } from './stores/categoriesStore'
-import { setIsOpenSettingsKey, isOpenSettingsKey } from '@/symbols'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -21,19 +20,16 @@ onBeforeMount(async () => {
   const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
     ?.currentSession?.access_token
   if (token) {
-    try {
-      const resp = await supabase.auth.api.getUser(token)
-      currentCategoryId.value = Number(route.query.category) || null
-      if (resp.user) {
-        userId.value = resp.user.id
-        user.value = await getUserData(resp.user.id)
-        setCategories(resp.user.id)
-        getTasks(resp.user.id)
-        setAllTask()
-      }
-    } catch (err) {
-      console.log(err)
+    const { user: User, error } = await supabase.auth.api.getUser(token)
+    currentCategoryId.value = Number(route.query.category) || null
+    if (User) {
+      userId.value = User.id
+      user.value = await getUserData(User.id)
+      setCategories(User.id)
+      getTasks(User.id)
+      setAllTask()
     }
+    if (error) console.log(error)
   }
 })
 
@@ -48,14 +44,6 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     user.value = null
   }
 })
-
-const isOpenSettings = ref(false)
-provide(isOpenSettingsKey, isOpenSettings)
-
-const setIsOpenSettings = () => {
-  isOpenSettings.value = !isOpenSettings.value
-}
-provide(setIsOpenSettingsKey, setIsOpenSettings)
 
 const theme = ref(localStorage.getItem('theme') || 'dark')
 document.documentElement.setAttribute('data-theme', theme.value)

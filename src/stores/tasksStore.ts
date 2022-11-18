@@ -53,7 +53,10 @@ export const useTasksStore = defineStore('tasks', {
         })
         .single()
       if (error) console.log(error)
-      if (data) this.getTasks(userId)
+      if (data) {
+        this.getTasks(userId)
+        this.setAllTask()
+      }
     },
     async updateTask(task: TcurrentTask) {
       if (task.id) {
@@ -82,8 +85,8 @@ export const useTasksStore = defineStore('tasks', {
         this.tasks = this.tasks.map((t) =>
           t.id == task.id ? { ...t, status: data.status } : t
         )
+        this.setAllTask()
       }
-      this.setAllTask()
     },
     async deleteTask(id: number) {
       const { data, error } = await supabase
@@ -94,6 +97,7 @@ export const useTasksStore = defineStore('tasks', {
       if (error) console.log(error)
       if (data) {
         this.tasks = this.tasks.filter((t) => t.id !== id)
+        this.setAllTask()
       }
     },
     async setAllTask() {
