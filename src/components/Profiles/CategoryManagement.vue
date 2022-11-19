@@ -86,7 +86,6 @@ const save = async () => {
 </template>
 
 <style scoped lang="sass">
-
 .category
   border-radius: 8px
   padding: 2px 8px
