@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import {
   createOne,
   deleteOne,
-  getAllByColumn,
+  getAllByColumns,
   updateOne
 } from '@/utils/queries'
 
@@ -20,11 +20,9 @@ export const useCategoriesStore = defineStore('categories', {
     const currentCategoryId = ref<number | null>(null)
 
     const setCategories = async (userId: string) => {
-      const data = await getAllByColumn<TCategory>(
-        'Categories',
-        'userId',
-        userId
-      )
+      const data = await getAllByColumns<TCategory>('Categories', [
+        { column: 'userId', value: userId }
+      ])
       if (data) categories.value = data
     }
 

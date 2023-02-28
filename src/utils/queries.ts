@@ -2,21 +2,6 @@ import { supabase } from '@/supabase'
 
 type Itables = 'Categories' | 'Tasks' | 'Users'
 
-export const getAllByColumn = async <T>(
-  table: Itables,
-  column: keyof T,
-  value: T[keyof T],
-  order?: keyof T
-) => {
-  const { data, error } = await supabase
-    .from<T>(table)
-    .select()
-    .order(order ?? ('id' as keyof T))
-    .eq(column, value)
-  if (error) console.log(error)
-  return data
-}
-
 export const getAllByColumns = async <T>(
   table: Itables,
   eq: { column: keyof T; value: T[keyof T] | null }[],

@@ -1,12 +1,11 @@
 import { computed, ref } from 'vue'
 import { defineStore, storeToRefs } from 'pinia'
-import { supabase } from '@/supabase'
 import { useUserStore } from './userStore'
 import { useCategoriesStore } from './categoriesStore'
 import type { TcurrentTask } from '@/components/Home/TaskBlock.vue'
 import {
   createOne,
-  getAllByColumn,
+  deleteOne,
   getAllByColumns,
   updateOne
 } from '@/utils/queries'
@@ -44,7 +43,9 @@ export const useTasksStore = defineStore('tasks', {
 
     const setAllTask = async () => {
       const { userId } = storeToRefs(useUserStore())
-      const data = await getAllByColumn<Ttask>('Tasks', 'userId', userId.value)
+      const data = await getAllByColumns<Ttask>('Tasks', [
+        { column: 'userId', value: userId.value }
+      ])
       if (data) allTasks.value = data
     }
 
@@ -95,12 +96,7 @@ export const useTasksStore = defineStore('tasks', {
     }
 
     const deleteTask = async (id: number) => {
-      const { data, error } = await supabase
-        .from<Ttask>('Tasks')
-        .delete()
-        .eq('id', id)
-        .single()
-      if (error) console.log(error)
+      const data = await deleteOne<Ttask>('Tasks', id)
       if (data) {
         tasks.value = tasks.value.filter((t) => t.id !== id)
         setAllTask()
