@@ -1,24 +1,8 @@
 <script setup lang="ts">
-import { watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categoriesStore'
-import { useTasksStore } from '@/stores/tasksStore'
-import { useUserStore } from '@/stores/userStore'
-
-const route = useRoute()
 
 const { categories, currentCategoryId } = storeToRefs(useCategoriesStore())
-const { setTasks } = useTasksStore()
-const { userId } = storeToRefs(useUserStore())
-
-watch(
-  () => route.query.category,
-  (cur) => {
-    currentCategoryId.value = Number(cur)
-    setTasks(userId.value)
-  }
-)
 </script>
 
 <template>
@@ -28,7 +12,7 @@ watch(
         <div class="flex items-center">
           <router-link
             class="cbtn"
-            :class="{ active: currentCategoryId == null }"
+            :class="{ active: currentCategoryId === null }"
             :to="{ query: { category: null } }"
           >
             все
