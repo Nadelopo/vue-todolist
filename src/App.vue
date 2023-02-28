@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { useTasksStore } from '@/stores/tasksStore'
-import { storeToRefs } from 'pinia'
 import { onBeforeMount, ref } from 'vue'
-import { useUserStore } from './stores/userStore'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import { supabase } from './supabase'
+import { useTasksStore } from '@/stores/tasksStore'
+import { useUserStore } from './stores/userStore'
 import Navbar from '@/components/Navbar.vue'
 import { useCategoriesStore } from './stores/categoriesStore'
-import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
 const { userId, user } = storeToRefs(useUserStore())
-const { getUserData } = useUserStore()
+const { setUserData } = useUserStore()
 const { setCategories } = useCategoriesStore()
-const { getTasks, setAllTask } = useTasksStore()
+const { setTasks, setAllTask } = useTasksStore()
 const { currentCategoryId } = storeToRefs(useCategoriesStore())
 
+//fix
 onBeforeMount(async () => {
   const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
     ?.currentSession?.access_token
@@ -23,25 +24,27 @@ onBeforeMount(async () => {
     const { user: User, error } = await supabase.auth.api.getUser(token)
     currentCategoryId.value = Number(route.query.category) || null
     if (User) {
-      userId.value = User.id
-      user.value = await getUserData(User.id)
+      setUserData(User.id)
       setCategories(User.id)
-      getTasks(User.id)
+      setTasks(User.id)
       setAllTask()
     }
     if (error) console.log(error)
   }
 })
 
+const eventValue = ref('')
 supabase.auth.onAuthStateChange(async (event, session) => {
-  if (session && session.user) {
-    userId.value = session.user.id
-    user.value = await getUserData(session.user.id)
-    setCategories(session.user.id)
-    getTasks(session.user.id)
-  } else {
-    userId.value = ''
-    user.value = null
+  if (eventValue.value !== event) {
+    if (session && session.user) {
+      setUserData(session.user.id)
+      setCategories(session.user.id)
+      setTasks(session.user.id)
+    } else {
+      userId.value = ''
+      user.value = null
+    }
+    eventValue.value = event
   }
 })
 

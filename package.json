@@ -12,7 +12,6 @@
   "dependencies": {
     "@supabase/supabase-js": "^1.35.7",
     "@vueuse/core": "^9.3.0",
-    "firebase-tools": "^11.14.2",
     "pinia": "^2.0.21",
     "sweetalert2": "^11.5.1",
     "vite-plugin-pwa": "^0.13.1",

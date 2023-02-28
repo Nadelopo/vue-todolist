@@ -9,14 +9,14 @@ import { useUserStore } from '@/stores/userStore'
 const route = useRoute()
 
 const { categories, currentCategoryId } = storeToRefs(useCategoriesStore())
-const { getTasks } = useTasksStore()
+const { setTasks } = useTasksStore()
 const { userId } = storeToRefs(useUserStore())
 
 watch(
   () => route.query.category,
   (cur) => {
     currentCategoryId.value = Number(cur)
-    getTasks(userId.value)
+    setTasks(userId.value)
   }
 )
 </script>

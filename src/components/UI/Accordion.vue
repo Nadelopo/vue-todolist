@@ -9,31 +9,30 @@ interface Ichildrens {
 const props = defineProps({
   visible: {
     type: Boolean,
-    required: true,
+    required: true
   },
   paddingTop: {
     type: Number,
-    default: 5,
+    default: 5
   },
   paddingBottom: {
     type: Number,
-    default: 5,
+    default: 5
   },
   transition: {
     type: Number,
-    default: 0.3,
-  },
+    default: 0.3
+  }
 })
 
 const parent = ref()
 const childrenns = ref<Ichildrens[]>([])
 
 onMounted(() => {
-  const childs = [...parent.value.childNodes]
-  childs.shift()
-  childs.reverse().shift()
-  childs.forEach((el) => {
-    childrenns.value.push({ element: el, height: el.scrollHeight })
+  const childs: HTMLElement[] = [...parent.value.children]
+
+  childrenns.value = childs.map((el) => {
+    return { element: el, height: el.scrollHeight }
   })
 })
 
