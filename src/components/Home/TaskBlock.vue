@@ -1,25 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useTasksStore } from '@/stores/tasksStore'
+import { useTasksStore, type CurrentTask } from '@/stores/tasksStore'
 import Popup from '@/components/UI/Popup.vue'
-
-export type TcurrentTask = {
-  id?: number
-  title?: string
-}
 
 const { tasks } = storeToRefs(useTasksStore())
 const { updateTask, editTaskStatus, deleteTask } = useTasksStore()
 
 const isInputOpen = ref(false)
-const currentChangedTask = ref<TcurrentTask>({})
+const currentChangedTask = ref<CurrentTask>({})
 
 const changeTask = (id: number, title: string) => {
   isInputOpen.value = true
   currentChangedTask.value = {
     id,
-    title,
+    title
   }
 }
 
@@ -51,7 +46,7 @@ const saveChanges = async () => {
               <div
                 :class="{
                   check__off: task.status == false,
-                  check__on: task.status == true,
+                  check__on: task.status == true
                 }"
                 @click="editTaskStatus(task)"
               ></div>

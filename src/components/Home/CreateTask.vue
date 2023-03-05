@@ -5,11 +5,11 @@ import { onClickOutside } from '@vueuse/core'
 import Swal from 'sweetalert2'
 import TaskBlock from '@/components/Home/TaskBlock.vue'
 import { useUserStore } from '@/stores/userStore'
-import { useCategoriesStore, type TCategory } from '@/stores/categoriesStore'
+import { useCategoriesStore, type Category } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
 import TickSVG from '@/assets/icons/tick.svg?component'
 
-export type TcurrentCategory = {
+interface CurrentCategory {
   id?: number
   title?: string
 }
@@ -22,7 +22,7 @@ const open = ref(false)
 const setOpen = (value: boolean) => (open.value = value)
 
 const newTask = ref('')
-const currentCategory = ref<TcurrentCategory>({})
+const currentCategory = ref<CurrentCategory>({})
 const formWarning = ref(false)
 const createTask = async () => {
   if (!currentCategory.value.id || !newTask.value) {
@@ -42,10 +42,10 @@ const openSelect = () => {
 const wrapRef = ref(null)
 onClickOutside(wrapRef, () => (activeSelect.value = false))
 
-const setCurrentCategory = (category: TCategory) => {
+const setCurrentCategory = (category: Category) => {
   currentCategory.value = {
     id: category.id,
-    title: category.title,
+    title: category.title
   }
   activeSelect.value = false
 }

@@ -3,18 +3,21 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Swal from 'sweetalert2'
 import { supabase } from '@/supabase'
-import type { TCategory } from '@/stores/categoriesStore'
-import type { Tuser } from '@/stores/userStore'
+import { createOne } from '@/utils/queries'
+import { useCategoriesStore, type Category } from '@/stores/categoriesStore'
+import type { User } from '@/stores/userStore'
 
 const email = ref('')
 const password = ref('')
-const change = ref(true)
+const switchForm = ref(true)
 const router = useRouter()
+
+const { setCategories } = useCategoriesStore()
 
 const signUp = async () => {
   const { user, error } = await supabase.auth.signUp({
     email: email.value,
-    password: password.value,
+    password: password.value
   })
   if (error) {
     console.log(error)
@@ -29,32 +32,31 @@ const signUp = async () => {
     Swal.fire(message, '', 'error')
   }
   if (user) {
-    const { error: insertUser } = await supabase
-      .from<Tuser>('Users')
-      .insert([{ id: user.id, email: email.value }])
-      .single()
-    const { error: insertCategory } = await supabase
-      .from<TCategory>('Categories')
-      .insert({ title: 'ежедневные', userId: user.id })
-
-    if (insertUser) console.log(insertUser)
-    if (insertCategory) console.log(insertCategory)
-    router.push({ name: 'Home' })
+    const data = await createOne<User>('Users', {
+      id: user.id,
+      email: user.email
+    })
+    if (data) {
+      await createOne<Category>('Categories', {
+        title: 'ежедневные',
+        userId: user.id
+      })
+      await setCategories(user.id)
+      router.push({ name: 'Home' })
+    }
   }
 }
 
 const signIn = async () => {
   const { error } = await supabase.auth.signIn({
     email: email.value,
-    password: password.value,
+    password: password.value
   })
   if (error) {
     console.log(error)
     Swal.fire('Данные не верны', '', 'error')
   } else router.push({ name: 'Home' })
 }
-
-const choiceAuth = () => (change.value ? signIn() : signUp())
 </script>
 
 <template>
@@ -62,15 +64,15 @@ const choiceAuth = () => (change.value ? signIn() : signUp())
     <div class="login__wrapper">
       <div class="flex justify-between">
         <div>
-          <button class="mbtn mb-6" @click="change = true">войти</button>
+          <button class="mbtn mb-6" @click="switchForm = true">войти</button>
         </div>
         <div>
-          <button class="mbtn" @click="change = false">
+          <button class="mbtn" @click="switchForm = false">
             зарегестрироваться
           </button>
         </div>
       </div>
-      <form @submit.prevent="choiceAuth">
+      <form @submit.prevent="switchForm ? signIn() : signUp()">
         <div class="mb-4">
           <input v-model="email" type="email" placeholder="почта" required />
         </div>
@@ -85,7 +87,7 @@ const choiceAuth = () => (change.value ? signIn() : signUp())
         </div>
         <div>
           <button class="mbtn">
-            {{ change ? 'войти' : 'зарегестрироваться' }}
+            {{ switchForm ? 'войти' : 'зарегестрироваться' }}
           </button>
         </div>
       </form>
