@@ -12,9 +12,9 @@ const signOut = async () => {
   router.push({ name: 'Auth' })
 }
 
-const isOpenSettings = ref(false)
-const setIsOpenSettings = () => {
-  isOpenSettings.value = !isOpenSettings.value
+const showSettings = ref(false)
+const setShowSettings = () => {
+  showSettings.value = !showSettings.value
 }
 </script>
 
@@ -36,12 +36,12 @@ const setIsOpenSettings = () => {
           </router-link>
         </div>
 
-        <SettingSVG @click="setIsOpenSettings" />
+        <SettingSVG @click="setShowSettings" />
       </div>
     </div>
   </div>
   <transition name="settings">
-    <Settings v-if="isOpenSettings" :set-open-settings="setIsOpenSettings" />
+    <Settings v-if="showSettings" :set-close-settings="setShowSettings" />
   </transition>
 </template>
 

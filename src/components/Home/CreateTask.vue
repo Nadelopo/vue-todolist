@@ -18,9 +18,6 @@ const { user, userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
 const { addTask } = useTasksStore()
 
-const open = ref(false)
-const setOpen = (value: boolean) => (open.value = value)
-
 const newTask = ref('')
 const currentCategory = ref<CurrentCategory>({})
 const formWarning = ref(false)
@@ -34,33 +31,31 @@ const createTask = async () => {
   }
 }
 
-const activeSelect = ref(false)
-const openSelect = () => {
-  activeSelect.value = !activeSelect.value
-}
+const showCreateTask = ref(false)
+const showSelect = ref(false)
 
-const wrapRef = ref(null)
-onClickOutside(wrapRef, () => (activeSelect.value = false))
+const selectRef = ref(null)
+onClickOutside(selectRef, () => (showSelect.value = false))
 
 const setCurrentCategory = (category: Category) => {
   currentCategory.value = {
     id: category.id,
     title: category.title
   }
-  activeSelect.value = false
+  showSelect.value = false
 }
 </script>
 
 <template>
   <div>
     <div class="mb-4 mx-auto">
-      <button class="cbtn" @click="setOpen(!open)">
-        <div>{{ open ? 'закрыть' : 'создать' }}</div>
+      <button class="cbtn" @click="showCreateTask = !showCreateTask">
+        <div>{{ showCreateTask ? 'закрыть' : 'создать' }}</div>
       </button>
     </div>
     <div>
       <transition-group name="flip">
-        <div v-if="open" :key="0" class="wrapper">
+        <div v-if="showCreateTask" :key="0" class="wrapper">
           <div class="mb-4">
             <input
               v-model="newTask"
@@ -73,10 +68,10 @@ const setCurrentCategory = (category: Category) => {
           </div>
           <div class="mb-4 relative z-0">
             <div
-              ref="wrapRef"
+              ref="selectRef"
               class="select"
-              :class="{ active: activeSelect, form__warning: formWarning }"
-              @click="openSelect"
+              :class="{ active: showSelect, form__warning: formWarning }"
+              @click="showSelect = !showSelect"
             >
               <div>
                 {{ currentCategory.title ?? 'Выберите категорию' }}
@@ -86,7 +81,7 @@ const setCurrentCategory = (category: Category) => {
               </div>
             </div>
             <div style="user-select: none">.</div>
-            <div v-if="user" class="list" :class="{ active: activeSelect }">
+            <div v-if="user" class="list" :class="{ active: showSelect }">
               <div
                 v-for="category in categories"
                 :key="category.id"

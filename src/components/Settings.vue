@@ -1,31 +1,23 @@
 <script setup lang="ts">
-import { ref, watch, type PropType } from 'vue'
+import { ref, type PropType } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 import Accordion from './UI/Accordion.vue'
 import CloseSVG from '@/assets/icons/close.svg?component'
+import { useTheme } from '@/utils/theme'
 
 const props = defineProps({
-  setOpenSettings: {
+  setCloseSettings: {
     type: Function as PropType<() => void>,
-    required: true,
-  },
+    required: true
+  }
 })
 
 const visible = ref(false)
 
 const contentRef = ref(null)
-onClickOutside(contentRef, () => props.setOpenSettings())
+onClickOutside(contentRef, () => props.setCloseSettings())
 
-const theme = ref(localStorage.getItem('theme') || 'dark')
-const setTheme = (value: string) => (theme.value = value)
-
-watch(
-  () => theme.value,
-  (current) => {
-    document.documentElement.setAttribute('data-theme', current)
-    localStorage.setItem('theme', current)
-  }
-)
+const { setTheme } = useTheme()
 </script>
 
 <template>
@@ -36,7 +28,7 @@ watch(
           <div class="flex justify-between mb-2">
             <div>настройки</div>
             <div>
-              <CloseSVG @click="setOpenSettings" />
+              <CloseSVG @click="setCloseSettings" />
             </div>
           </div>
           <hr />

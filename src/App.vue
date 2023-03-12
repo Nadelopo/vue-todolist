@@ -7,6 +7,7 @@ import { useTasksStore } from '@/stores/tasksStore'
 import { useUserStore } from './stores/userStore'
 import Navbar from '@/components/Navbar.vue'
 import { useCategoriesStore } from './stores/categoriesStore'
+import { useTheme } from './utils/theme'
 
 const { userId, user } = storeToRefs(useUserStore())
 const { setUserData } = useUserStore()
@@ -42,8 +43,7 @@ watch(
   }
 )
 
-const theme = ref(localStorage.getItem('theme') || 'dark')
-document.documentElement.setAttribute('data-theme', theme.value)
+useTheme()
 </script>
 
 <template>
@@ -56,5 +56,3 @@ document.documentElement.setAttribute('data-theme', theme.value)
     </div>
   </main>
 </template>
-
-<style scoped></style>

@@ -10,28 +10,28 @@ const { userId } = storeToRefs(useUserStore())
 const { categories } = storeToRefs(useCategoriesStore())
 const { createCategory, deleteCategory, updateCategory } = useCategoriesStore()
 
-const openInput = ref(false)
+const showInput = ref(false)
 const changeCategory = ref('')
 const currentCategoryId = ref(0)
 const changeStateCategory = ref(false)
 
 const change = (id: number, title: string) => {
   changeStateCategory.value = true
-  openInput.value = false
+  showInput.value = false
   changeCategory.value = title
   currentCategoryId.value = id
 }
 
 const openAddCategory = () => {
   changeStateCategory.value = false
-  openInput.value = true
+  showInput.value = true
 }
 
 const newCategory = ref('')
 
 const cancel = () => {
   changeStateCategory.value = false
-  openInput.value = false
+  showInput.value = false
   newCategory.value = ''
   changeCategory.value = ''
 }
@@ -40,7 +40,7 @@ const save = async () => {
   if (newCategory.value || changeCategory.value) {
     if (changeStateCategory.value) {
       updateCategory(changeCategory.value, currentCategoryId.value)
-    } else if (openInput.value) {
+    } else if (showInput.value) {
       createCategory(newCategory.value, userId.value)
     }
     cancel()
@@ -65,10 +65,10 @@ const save = async () => {
           />
         </div>
       </div>
-      <div v-if="openInput">
+      <div v-if="showInput">
         <input v-model="newCategory" type="text" class="mt-6" />
       </div>
-      <div v-if="!openInput && !changeStateCategory">
+      <div v-if="!showInput && !changeStateCategory">
         <button class="mbtn mt-6" @click="openAddCategory">
           добавить категорию
         </button>
@@ -77,7 +77,7 @@ const save = async () => {
         <input v-model="changeCategory" type="text" class="mt-6" />
       </div>
 
-      <div v-if="openInput || changeStateCategory">
+      <div v-if="showInput || changeStateCategory">
         <button class="mbtn mt-4" @click="cancel">отменить</button>
       </div>
       <button class="mbtn mt-6" @click="save">сохранить</button>

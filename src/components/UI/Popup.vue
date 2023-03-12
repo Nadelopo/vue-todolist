@@ -6,40 +6,39 @@ import { onClickOutside } from '@vueuse/core'
 defineProps({
   id: {
     type: Number,
-    required: true,
+    required: true
   },
   deleteHandler: {
     type: Function as PropType<(id: number) => Promise<void>>,
-    required: true,
+    required: true
   },
   change: {
     type: Function as PropType<(id: number, title: string) => void>,
-    default: () => null,
+    default: () => null
   },
   title: {
     type: String,
-    default: '',
-  },
+    default: ''
+  }
 })
 
-const isOpen = ref(false)
+const showPopup = ref(false)
 const popupRef = ref<HTMLDivElement>()
+onClickOutside(popupRef, () => (showPopup.value = false))
 
-onClickOutside(popupRef, () => (isOpen.value = false))
+const changePosition = ref(false)
 
-const changePossition = ref(false)
-
-watch(isOpen, () => {
-  if (isOpen.value) changePossition.value = true
+watch(showPopup, () => {
+  if (showPopup.value) changePosition.value = true
   setTimeout(() => {
-    if (!isOpen.value) changePossition.value = false
-  }, 200)
+    if (!showPopup.value) changePosition.value = false
+  }, 100)
 })
 </script>
 
 <template>
-  <div class="flex flex-column" :class="{ relative: changePossition }">
-    <div class="popup" :class="{ active: isOpen }">
+  <div class="flex flex-column" :class="{ relative: changePosition }">
+    <div class="popup" :class="{ active: showPopup }">
       <button class="cbtn" @click="deleteHandler(id)">удалить</button>
       <button v-if="change" class="cbtn" @click="change(id, title)">
         изменить
@@ -49,7 +48,7 @@ watch(isOpen, () => {
       <div
         ref="popupRef"
         class="flex flex-col gap-y-0.5 items-center w-4 cursor-pointer"
-        @click="isOpen = !isOpen"
+        @click="showPopup = !showPopup"
       >
         <div class="dot"></div>
         <div class="dot"></div>
@@ -69,10 +68,13 @@ watch(isOpen, () => {
   top: 0
   visibility: hidden
   opacity: 0
-  transition: .2s
+  transition: .1s
+  transform: scale(0)
   &.active
     opacity: 1
     visibility: visible
+    transform: scale(1)
+
 
 .dot
   border: 2px solid var(--color)
@@ -84,6 +86,4 @@ watch(isOpen, () => {
   align-items: center
   border-radius: 4px
   transition: .4s
-  &:hover
-    background: var(--back-second)
 </style>
