@@ -34,7 +34,7 @@ export const useCategoriesStore = defineStore('categories', () => {
     const data = await updateOne<Category>('Categories', { title }, id)
     if (data) {
       categories.value = categories.value.map((cat) =>
-        cat.id == data.id ? { ...cat, title: data.title } : cat
+        cat.id === data.id ? { ...cat, title: data.title } : cat
       )
     }
   }

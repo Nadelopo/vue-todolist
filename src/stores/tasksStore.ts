@@ -89,7 +89,7 @@ export const useTasksStore = defineStore('Tasks', () => {
 
     if (data) {
       tasks.value = tasks.value.map((t) =>
-        t.id == task.id ? { ...t, status: data.status } : t
+        t.id === task.id ? { ...t, status: data.status } : t
       )
       setAllTask()
     }
