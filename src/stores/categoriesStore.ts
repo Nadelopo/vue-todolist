@@ -1,51 +1,68 @@
 import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import {
-  createOne,
-  deleteOne,
-  getAllByColumns,
-  updateOne
-} from '@/utils/queries'
+import { supabase } from '@/db/supabase'
+import type { Tables } from '@/db/types'
 
-export interface Category {
-  id: number
-  created_at: Date
-  title: string
-  userId: string
+export type Category = Tables<'Categories'>
+
+const categories = ref<Category[]>([])
+const currentCategoryId = ref<number | null>(null)
+
+const setCategories = async (userId: string | undefined) => {
+  if (userId === undefined) {
+    categories.value = []
+    return
+  }
+  const { data, error } = await supabase
+    .from('Categories')
+    .select()
+    .eq('userId', userId)
+  if (error) {
+    console.error(error)
+    return
+  }
+  categories.value = data
 }
 
-export const useCategoriesStore = defineStore('categories', () => {
-  const categories = ref<Category[]>([])
-  const currentCategoryId = ref<number | null>(null)
-
-  const setCategories = async (userId: string) => {
-    const data = await getAllByColumns<Category>('Categories', [
-      { column: 'userId', value: userId }
-    ])
-    if (data) categories.value = data
+const createCategory = async (title: string, userId: string) => {
+  const { data, error } = await supabase
+    .from('Categories')
+    .insert({ title, userId })
+    .select()
+    .single()
+  if (error) {
+    console.error(error)
+    return
   }
+  categories.value.push(data)
+}
 
-  const createCategory = async (title: string, userId: string) => {
-    const data = await createOne<Category>('Categories', { title, userId })
-    if (data) categories.value.push(data)
+const updateCategory = async (title: string, id: number) => {
+  const { error } = await supabase
+    .from('Categories')
+    .update({ title })
+    .eq('id', id)
+  if (error) {
+    console.error(error)
+    return
   }
+  categories.value = categories.value.map((cat) =>
+    cat.id === id ? { ...cat, title: title } : cat
+  )
+}
 
-  const updateCategory = async (title: string, id: number) => {
-    const data = await updateOne<Category>('Categories', { title }, id)
-    if (data) {
-      categories.value = categories.value.map((cat) =>
-        cat.id === data.id ? { ...cat, title: data.title } : cat
-      )
-    }
+const deleteCategory = async (categoryId: number) => {
+  const { error } = await supabase
+    .from('Categories')
+    .delete()
+    .eq('id', categoryId)
+  if (error) {
+    console.error(error)
+    return
   }
+  categories.value = categories.value.filter((cat) => cat.id !== categoryId)
+}
 
-  const deleteCategory = async (categoryId: number) => {
-    const data = await deleteOne<Category>('Categories', categoryId)
-    if (data) {
-      categories.value = categories.value.filter((cat) => cat.id !== data.id)
-    }
-  }
-
+export const useCategoriesStore = () => {
   return {
     categories,
     currentCategoryId,
@@ -54,4 +71,4 @@ export const useCategoriesStore = defineStore('categories', () => {
     updateCategory,
     deleteCategory
   }
-})
+}

@@ -1,3 +1,5 @@
+import { supabase } from '@/db/supabase'
+import { useUserStore } from '@/stores/userStore'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -5,32 +7,37 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'Home',
-      component: () => import('../pages/Home.vue'),
+      component: () => import('../layouts/Main.vue'),
+      meta: { auth: true },
+      children: [
+        {
+          path: '',
+          name: 'Home',
+          component: () => import('../pages/Home.vue')
+        },
+        {
+          path: 'profile',
+          name: 'Profile',
+          component: () => import('../pages/Profile.vue')
+        }
+      ]
     },
     {
       path: '/auth',
       name: 'Auth',
-      meta: { auth: true },
-      component: () => import('../pages/Auth.vue'),
-    },
-    {
-      path: '/profile',
-      name: 'Profile',
-      component: () => import('../pages/Profile.vue'),
-    },
-  ],
+      component: () => import('../pages/Auth.vue')
+    }
+  ]
 })
 
-router.beforeEach(async (to, from, next) => {
-  const requireAuth = to.matched.some((record) => !record.meta.auth)
-  const token = JSON.parse(localStorage.getItem('supabase.auth.token') || '{}')
-    ?.currentSession?.access_token
-  if (requireAuth && !token) {
-    next('/auth')
-  } else {
-    next()
-  }
+router.beforeEach(async (to) => {
+  const requireAuth = to.matched.some((record) => record.meta.auth)
+  if (!requireAuth) return true
+  const store = useUserStore()
+  if (store.user.value) return true
+  const { data } = await supabase.auth.getUser()
+  if (data.user) return true
+  return { name: 'Auth' }
 })
 
 export default router

@@ -1,8 +1,15 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useTasksStore } from '@/stores/tasksStore'
-import { storeToRefs } from 'pinia'
 
-const { completedTasks, notCompletedTasks } = storeToRefs(useTasksStore())
+const { allTasks } = useTasksStore()
+
+const completedTasks = computed(() => {
+  return allTasks.value.filter((t) => t.status).length
+})
+const notCompletedTasks = computed(() => {
+  return allTasks.value.filter((t) => !t.status).length
+})
 </script>
 
 <template>

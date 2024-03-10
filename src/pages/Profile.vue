@@ -4,8 +4,6 @@ import OverviewsTasks from '../components/Profiles/OverviewsTasks.vue'
 </script>
 
 <template>
-  <div>
-    <OverviewsTasks />
-    <CategoryManagement />
-  </div>
+  <OverviewsTasks />
+  <CategoryManagement />
 </template>

@@ -1,42 +1,42 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import { onClickOutside } from '@vueuse/core'
-import Swal from 'sweetalert2'
-import TaskBlock from '@/components/Home/TaskBlock.vue'
 import { useUserStore } from '@/stores/userStore'
 import { useCategoriesStore, type Category } from '@/stores/categoriesStore'
 import { useTasksStore } from '@/stores/tasksStore'
+import { onClickOutsideClose } from '@/utils/onClickOutsideClose'
+import TaskBlock from '@/components/Home/TaskBlock.vue'
 import TickSVG from '@/assets/icons/tick.svg?component'
+import { useToast } from 'vue-toastification'
 
-interface CurrentCategory {
-  id?: number
-  title?: string
+type CurrentCategory = {
+  id: number
+  title: string
 }
 
-const { user, userId } = storeToRefs(useUserStore())
-const { categories } = storeToRefs(useCategoriesStore())
-const { addTask } = useTasksStore()
+const toast = useToast()
 
+const { user } = useUserStore()
+const { addTask } = useTasksStore()
 const newTask = ref('')
-const currentCategory = ref<CurrentCategory>({})
+const currentCategory = ref<CurrentCategory | null>(null)
 const formWarning = ref(false)
 const createTask = async () => {
-  if (!currentCategory.value.id || !newTask.value) {
+  if (!user.value) return
+  if (!newTask.value || !currentCategory.value) {
     formWarning.value = true
-    Swal.fire('Заполните поля', '', 'warning')
-  } else if (currentCategory.value.id !== null) {
-    addTask(newTask.value, currentCategory.value.id, userId.value)
-    newTask.value = ''
+    toast.warning('Заполните поля')
+    return
   }
+  await addTask(newTask.value, currentCategory.value.id, user.value.id)
+  newTask.value = ''
 }
 
 const showCreateTask = ref(false)
-const showSelect = ref(false)
 
-const selectRef = ref(null)
-onClickOutside(selectRef, () => (showSelect.value = false))
+const selectRef = ref<HTMLElement>()
+const showSelect = onClickOutsideClose(selectRef)
 
+const { categories } = useCategoriesStore()
 const setCurrentCategory = (category: Category) => {
   currentCategory.value = {
     id: category.id,
@@ -49,13 +49,20 @@ const setCurrentCategory = (category: Category) => {
 <template>
   <div>
     <div class="mb-4 mx-auto">
-      <button class="cbtn" @click="showCreateTask = !showCreateTask">
+      <button
+        class="cbtn"
+        @click="showCreateTask = !showCreateTask"
+      >
         <div>{{ showCreateTask ? 'закрыть' : 'создать' }}</div>
       </button>
     </div>
     <div>
       <transition-group name="flip">
-        <div v-if="showCreateTask" :key="0" class="wrapper">
+        <div
+          v-if="showCreateTask"
+          :key="0"
+          class="wrapper"
+        >
           <div class="mb-4">
             <input
               v-model="newTask"
@@ -74,14 +81,18 @@ const setCurrentCategory = (category: Category) => {
               @click="showSelect = !showSelect"
             >
               <div>
-                {{ currentCategory.title ?? 'Выберите категорию' }}
+                {{ currentCategory?.title ?? 'Выберите категорию' }}
               </div>
               <div>
                 <TickSVG />
               </div>
             </div>
             <div style="user-select: none">.</div>
-            <div v-if="user" class="list" :class="{ active: showSelect }">
+            <div
+              v-if="user"
+              class="list"
+              :class="{ active: showSelect }"
+            >
               <div
                 v-for="category in categories"
                 :key="category.id"
@@ -95,7 +106,12 @@ const setCurrentCategory = (category: Category) => {
             </div>
           </div>
           <div>
-            <button class="mbtn mt-3" @click="createTask">добавить</button>
+            <button
+              class="mbtn mt-3"
+              @click="createTask"
+            >
+              добавить
+            </button>
           </div>
         </div>
         <TaskBlock :key="1" />

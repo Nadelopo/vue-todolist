@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { useCategoriesStore } from '@/stores/categoriesStore'
 
-const { categories, currentCategoryId } = storeToRefs(useCategoriesStore())
+const { categories, currentCategoryId } = useCategoriesStore()
 </script>
 
 <template>

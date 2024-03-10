@@ -1,54 +1,44 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import type { PropType } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { ref } from 'vue'
+import { onClickOutsideClose } from '@/utils/onClickOutsideClose'
 
-defineProps({
-  id: {
-    type: Number,
-    required: true
-  },
-  deleteHandler: {
-    type: Function as PropType<(id: number) => Promise<void>>,
-    required: true
-  },
-  change: {
-    type: Function as PropType<(id: number, title: string) => void>,
-    default: () => null
-  },
-  title: {
-    type: String,
-    default: ''
-  }
-})
+const emit = defineEmits<{
+  delete: [id: number]
+  change: [id: number, title: string]
+}>()
 
-const showPopup = ref(false)
+defineProps<{ id: number; title: string }>()
+
 const popupRef = ref<HTMLDivElement>()
-onClickOutside(popupRef, () => (showPopup.value = false))
-
-const changePosition = ref(false)
-
-watch(showPopup, () => {
-  if (showPopup.value) changePosition.value = true
-  setTimeout(() => {
-    if (!showPopup.value) changePosition.value = false
-  }, 100)
-})
+const show = onClickOutsideClose(popupRef)
 </script>
 
 <template>
-  <div class="flex flex-column" :class="{ relative: changePosition }">
-    <div class="popup" :class="{ active: showPopup }">
-      <button class="cbtn" @click="deleteHandler(id)">удалить</button>
-      <button v-if="change" class="cbtn" @click="change(id, title)">
-        изменить
-      </button>
-    </div>
+  <div class="flex flex-column relative">
+    <Transition name="popup">
+      <div
+        v-if="show"
+        class="popup"
+      >
+        <button
+          class="cbtn"
+          @click="emit('delete', id)"
+        >
+          удалить
+        </button>
+        <button
+          class="cbtn"
+          @click="emit('change', id, title)"
+        >
+          изменить
+        </button>
+      </div>
+    </Transition>
     <div class="dots__wrapper">
       <div
         ref="popupRef"
         class="flex flex-col gap-y-0.5 items-center w-4 cursor-pointer"
-        @click="showPopup = !showPopup"
+        @click="show = !show"
       >
         <div class="dot"></div>
         <div class="dot"></div>
@@ -59,6 +49,19 @@ watch(showPopup, () => {
 </template>
 
 <style scoped lang="sass">
+.popup-enter-active,
+.popup-leave-active
+  transition: .2s ease
+  opacity: 1
+  transform: scale(1)
+
+
+.popup-enter-from,
+.popup-leave-to
+  opacity: 0
+  transform: scale(0)
+
+
 .popup
   position: absolute
   border: 2px solid var(--back-main)
@@ -66,15 +69,6 @@ watch(showPopup, () => {
   background: var(--back-second)
   right: 20px
   top: 0
-  visibility: hidden
-  opacity: 0
-  transition: .1s
-  transform: scale(0)
-  &.active
-    opacity: 1
-    visibility: visible
-    transform: scale(1)
-
 
 .dot
   border: 2px solid var(--color)

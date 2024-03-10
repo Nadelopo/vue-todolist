@@ -1,48 +1,61 @@
 <script setup lang="ts">
-import { ref, type PropType } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { ref } from 'vue'
 import Accordion from './UI/Accordion.vue'
-import CloseSVG from '@/assets/icons/close.svg?component'
 import { useTheme } from '@/utils/theme'
+import CloseSVG from '@/assets/icons/close.svg?component'
 
-const props = defineProps({
-  setCloseSettings: {
-    type: Function as PropType<() => void>,
-    required: true
-  }
-})
+const emit = defineEmits<{
+  close: []
+}>()
 
 const visible = ref(false)
 
-const contentRef = ref(null)
-onClickOutside(contentRef, () => props.setCloseSettings())
-
 const { setTheme } = useTheme()
+
+const themes = [
+  { value: 'dark', title: 'темная' },
+  { value: 'light', title: 'светлая' },
+  { value: 'turquoise', title: 'бирюзовый' },
+  { value: 'purple', title: 'фиолетовый' },
+  { value: 'orange', title: 'оранжевый' }
+]
 </script>
 
 <template>
   <div>
-    <div class="root">
+    <div
+      class="root"
+      @click.stop="emit('close')"
+    >
       <div class="container">
-        <div ref="contentRef" class="wrapper">
+        <div
+          class="wrapper"
+          @click.stop
+        >
           <div class="flex justify-between mb-2">
             <div>настройки</div>
             <div>
-              <CloseSVG @click="setCloseSettings" />
+              <CloseSVG @click="emit('close')" />
             </div>
           </div>
           <hr />
 
           <div class="mt-4">
-            <div class="cursor-pointer" @click="visible = !visible">
+            <div
+              class="cursor-pointer"
+              @click="visible = !visible"
+            >
               сменить тему
             </div>
             <Accordion :visible="visible">
-              <div class="li" @click="setTheme('dark')">темная</div>
-              <div class="li" @click="setTheme('light')">светлая</div>
-              <div class="li" @click="setTheme('turquoise')">бирюзовый</div>
-              <div class="li" @click="setTheme('purple')">фиолетовый</div>
-              <div class="li" @click="setTheme('orange')">ораньжевый</div>
+              <div
+                v-for="theme in themes"
+                :key="theme.value"
+                class="li"
+                @click="setTheme(theme.value)"
+              >
+                {{ theme.title }}
+              </div>
             </Accordion>
           </div>
         </div>

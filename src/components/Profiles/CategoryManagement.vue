@@ -1,52 +1,57 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import Swal from 'sweetalert2'
 import { useCategoriesStore } from '@/stores/categoriesStore'
 import { useUserStore } from '@/stores/userStore'
 import Popup from '@/components/UI/Popup.vue'
+import { useToast } from 'vue-toastification'
 
-const { userId } = storeToRefs(useUserStore())
-const { categories } = storeToRefs(useCategoriesStore())
+const { user } = useUserStore()
+const { categories } = useCategoriesStore()
 const { createCategory, deleteCategory, updateCategory } = useCategoriesStore()
 
-const showInput = ref(false)
-const changeCategory = ref('')
+const showActionBlock = ref(false)
+const changeCategoryTitle = ref('')
 const currentCategoryId = ref(0)
-const changeStateCategory = ref(false)
+const typeAction = ref<'change' | 'create' | null>(null)
 
 const change = (id: number, title: string) => {
-  changeStateCategory.value = true
-  showInput.value = false
-  changeCategory.value = title
+  typeAction.value = 'change'
+  showActionBlock.value = true
+  changeCategoryTitle.value = title
   currentCategoryId.value = id
 }
 
-const openAddCategory = () => {
-  changeStateCategory.value = false
-  showInput.value = true
+const openCategoryActions = () => {
+  typeAction.value = 'create'
+  showActionBlock.value = true
 }
 
-const newCategory = ref('')
-
+const newCategoryTitle = ref('')
 const cancel = () => {
-  changeStateCategory.value = false
-  showInput.value = false
-  newCategory.value = ''
-  changeCategory.value = ''
+  typeAction.value = null
+  showActionBlock.value = false
+  newCategoryTitle.value = ''
+  changeCategoryTitle.value = ''
 }
 
+const toast = useToast()
 const save = async () => {
-  if (newCategory.value || changeCategory.value) {
-    if (changeStateCategory.value) {
-      updateCategory(changeCategory.value, currentCategoryId.value)
-    } else if (showInput.value) {
-      createCategory(newCategory.value, userId.value)
+  if (!user.value) return
+  if (typeAction.value === 'change') {
+    if (!changeCategoryTitle.value) {
+      toast.warning('Заполните данные')
+      return
     }
-    cancel()
-  } else {
-    Swal.fire('Заполните данные', '', 'warning')
+    await updateCategory(changeCategoryTitle.value, currentCategoryId.value)
   }
+  if (typeAction.value === 'create') {
+    if (!newCategoryTitle.value) {
+      toast.warning('Заполните данные')
+      return
+    }
+    await createCategory(newCategoryTitle.value, user.value.id)
+  }
+  cancel()
 }
 </script>
 
@@ -54,33 +59,62 @@ const save = async () => {
   <div>
     <div class="font-medium text-lg mb-4">Управление категориями</div>
     <div class="wrapper">
-      <div v-if="categories" class="flex flex-col gap-y-4">
-        <div v-for="category in categories" :key="category.id" class="category">
+      <div
+        v-if="categories"
+        class="flex flex-col gap-y-4"
+      >
+        <div
+          v-for="category in categories"
+          :key="category.id"
+          class="category"
+        >
           <div class="shadow__none">{{ category.title }}</div>
           <Popup
             :id="category.id"
-            :delete-handler="deleteCategory"
-            :change="change"
             :title="category.title"
+            @delete="deleteCategory"
+            @change="change"
           />
         </div>
       </div>
-      <div v-if="showInput">
-        <input v-model="newCategory" type="text" class="mt-6" />
+      <div v-if="showActionBlock">
+        <div>
+          <input
+            v-if="typeAction === 'create'"
+            v-model="newCategoryTitle"
+            type="text"
+            class="mt-6"
+          />
+          <input
+            v-else-if="typeAction === 'change'"
+            v-model="changeCategoryTitle"
+            type="text"
+            class="mt-6"
+          />
+        </div>
+        <div>
+          <button
+            class="mbtn mt-4"
+            @click="cancel"
+          >
+            отменить
+          </button>
+        </div>
       </div>
-      <div v-if="!showInput && !changeStateCategory">
-        <button class="mbtn mt-6" @click="openAddCategory">
+      <div v-else>
+        <button
+          class="mbtn mt-6"
+          @click="openCategoryActions"
+        >
           добавить категорию
         </button>
       </div>
-      <div v-if="changeStateCategory">
-        <input v-model="changeCategory" type="text" class="mt-6" />
-      </div>
-
-      <div v-if="showInput || changeStateCategory">
-        <button class="mbtn mt-4" @click="cancel">отменить</button>
-      </div>
-      <button class="mbtn mt-6" @click="save">сохранить</button>
+      <button
+        class="mbtn mt-6"
+        @click="save"
+      >
+        сохранить
+      </button>
     </div>
   </div>
 </template>

@@ -1,33 +1,35 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
 import { useTasksStore, type CurrentTask } from '@/stores/tasksStore'
 import Popup from '@/components/UI/Popup.vue'
 
-const { tasks } = storeToRefs(useTasksStore())
-const { updateTask, editTaskStatus, deleteTask } = useTasksStore()
+const { tasks } = useTasksStore()
+const { updateTask, deleteTask } = useTasksStore()
 
-const showInput = ref(false)
-const currentChangedTask = ref<CurrentTask>({})
+const showChaneTaskInput = ref(false)
+const currentChangedTask = ref<CurrentTask>({
+  id: 0,
+  title: ''
+})
 
 const changeTask = (id: number, title: string) => {
-  showInput.value = true
-  currentChangedTask.value = {
-    id,
-    title
-  }
+  showChaneTaskInput.value = true
+  currentChangedTask.value = { id, title }
 }
 
 const saveChanges = async () => {
   updateTask(currentChangedTask.value)
-  showInput.value = false
+  showChaneTaskInput.value = false
 }
 </script>
 
 <template>
   <div>
     <div class="wrapper">
-      <template v-for="task in tasks" :key="task.id">
+      <template
+        v-for="task in tasks"
+        :key="task.id"
+      >
         <div class="task__wrapper">
           <div
             :class="{ text__crossed: task.status }"
@@ -48,21 +50,32 @@ const saveChanges = async () => {
                   check__off: task.status == false,
                   check__on: task.status == true
                 }"
-                @click="editTaskStatus(task)"
-              ></div>
+                @click="updateTask({ status: !task.status, id: task.id })"
+              />
               <Popup
                 :id="task.id"
-                :delete-handler="deleteTask"
-                :change="changeTask"
                 :title="task.title"
+                @delete="deleteTask"
+                @change="changeTask"
               />
             </div>
           </div>
         </div>
       </template>
-      <div v-if="showInput" class="mt-6">
-        <input v-model="currentChangedTask.title" type="text" />
-        <button class="mbtn mt-4" @click="saveChanges">сохранить</button>
+      <div
+        v-if="showChaneTaskInput"
+        class="mt-6"
+      >
+        <input
+          v-model="currentChangedTask.title"
+          type="text"
+        />
+        <button
+          class="mbtn mt-4"
+          @click="saveChanges"
+        >
+          сохранить
+        </button>
       </div>
     </div>
   </div>

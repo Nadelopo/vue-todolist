@@ -1,14 +1,16 @@
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
-const setToLocaleStorage = (theme: string) => {
+const setToLocalStorage = (theme: string) => {
   document.documentElement.setAttribute('data-theme', theme)
   localStorage.setItem('theme', theme)
 }
 
 export const useTheme = () => {
   const theme = ref(localStorage.getItem('theme') || 'dark')
-  const setTheme = (value: string) => (theme.value = value)
-  setToLocaleStorage(theme.value)
-  watch(theme, (current) => setToLocaleStorage(current))
+  const setTheme = (value: string) => {
+    theme.value = value
+    setToLocalStorage(value)
+  }
+  setToLocalStorage(theme.value)
   return { theme, setTheme }
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2'
-import { supabase } from '@/supabase'
-import { createOne } from '@/utils/queries'
-import { useCategoriesStore, type Category } from '@/stores/categoriesStore'
-import type { User } from '@/stores/userStore'
+import { supabase } from '@/db/supabase'
+import { useToast } from 'vue-toastification'
+import { useCategoriesStore } from '@/stores/categoriesStore'
+
+const toast = useToast()
 
 const email = ref('')
 const password = ref('')
@@ -15,12 +15,12 @@ const router = useRouter()
 const { setCategories } = useCategoriesStore()
 
 const signUp = async () => {
-  const { user, error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value
   })
   if (error) {
-    console.log(error)
+    console.error(error)
     let message = 'Непредвиденная ошибка'
     switch (error.status) {
       case 400:
@@ -29,33 +29,32 @@ const signUp = async () => {
       case 422:
         message = 'Пароль должен состоять не менее чем из 6 символов'
     }
-    Swal.fire(message, '', 'error')
+    toast.error(message)
+    return
   }
-  if (user) {
-    const data = await createOne<User>('Users', {
-      id: user.id,
-      email: user.email
-    })
-    if (data) {
-      await createOne<Category>('Categories', {
-        title: 'ежедневные',
-        userId: user.id
-      })
-      await setCategories(user.id)
-      router.push({ name: 'Home' })
-    }
-  }
+  if (!data.user) return
+  const userResponse = await supabase
+    .from('Users')
+    .insert({ id: data.user.id, email: data.user.email! })
+  if (userResponse.error) return
+  await supabase
+    .from('Categories')
+    .insert({ title: 'ежедневные', userId: data.user.id })
+  await setCategories(data.user.id)
+  router.push({ name: 'Home' })
 }
 
 const signIn = async () => {
-  const { error } = await supabase.auth.signIn({
+  const { error } = await supabase.auth.signInWithPassword({
     email: email.value,
     password: password.value
   })
   if (error) {
-    console.log(error)
-    Swal.fire('Данные не верны', '', 'error')
-  } else router.push({ name: 'Home' })
+    console.error(error)
+    toast.error('Данные не верны')
+  } else {
+    router.push({ name: 'Home' })
+  }
 }
 </script>
 
@@ -64,17 +63,30 @@ const signIn = async () => {
     <div class="login__wrapper">
       <div class="flex justify-between">
         <div>
-          <button class="mbtn mb-6" @click="switchForm = true">войти</button>
+          <button
+            class="mbtn mb-6"
+            @click="switchForm = true"
+          >
+            войти
+          </button>
         </div>
         <div>
-          <button class="mbtn" @click="switchForm = false">
+          <button
+            class="mbtn"
+            @click="switchForm = false"
+          >
             зарегестрироваться
           </button>
         </div>
       </div>
       <form @submit.prevent="switchForm ? signIn() : signUp()">
         <div class="mb-4">
-          <input v-model="email" type="email" placeholder="почта" required />
+          <input
+            v-model="email"
+            type="email"
+            placeholder="почта"
+            required
+          />
         </div>
         <div class="mb-6">
           <input

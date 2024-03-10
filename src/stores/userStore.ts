@@ -1,21 +1,23 @@
 import { ref } from 'vue'
-import { defineStore } from 'pinia'
-import { getOneById } from '@/utils/queries'
+import { supabase } from '@/db/supabase'
+import type { Tables } from '@/db/types'
 
-export interface User {
-  id: string
-  email: string
-  created_at: Date
+export type User = Tables<'Users'>
+
+const user = ref<User | null>(null)
+
+const setUserData = async (id: string | undefined) => {
+  const { data, error } = await supabase
+    .from('Users')
+    .select()
+    .eq('id', id!)
+    .single()
+  if (error) {
+    console.error(error)
+  }
+  user.value = data
 }
 
-export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
-  const userId = ref('')
-
-  const setUserData = async (id: string) => {
-    userId.value = id
-    user.value = await getOneById<User>('Users', id)
-  }
-
-  return { user, userId, setUserData }
-})
+export const useUserStore = () => {
+  return { user, setUserData }
+}

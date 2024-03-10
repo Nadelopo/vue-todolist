@@ -1,117 +1,105 @@
-import { computed, ref } from 'vue'
-import { defineStore, storeToRefs } from 'pinia'
-import { useUserStore } from './userStore'
+import { ref } from 'vue'
+import { supabase } from '@/db/supabase'
 import { useCategoriesStore } from './categoriesStore'
+import type { Tables, TablesUpdate } from '@/db/types'
 
-import {
-  createOne,
-  deleteOne,
-  getAllByColumns,
-  updateOne
-} from '@/utils/queries'
-
-export interface CurrentTask {
-  id?: number
-  title?: string
-}
-
-interface Task {
+export type CurrentTask = {
   id: number
-  created_at: Date
   title: string
-  status: boolean
-  categoryId: number
-  userId: string
 }
 
-export const useTasksStore = defineStore('Tasks', () => {
-  const tasks = ref<Task[]>([])
-  const allTasks = ref<Task[]>([])
+type Task = Tables<'Tasks'>
 
-  const completedTasks = computed(() => {
-    return allTasks.value.filter((t) => t.status).length
-  })
+const tasks = ref<Task[]>([])
+const allTasks = ref<{ status: boolean }[]>([])
 
-  const notCompletedTasks = computed(() => {
-    return allTasks.value.filter((t) => !t.status).length
-  })
-
-  const setTasks = async (userId: string) => {
-    const { currentCategoryId } = storeToRefs(useCategoriesStore())
-    const data = await getAllByColumns<Task>('Tasks', [
-      { column: 'userId', value: userId },
-      { column: 'categoryId', value: currentCategoryId.value }
-    ])
-    if (data) tasks.value = data.reverse()
+const setTasks = async () => {
+  const { currentCategoryId } = useCategoriesStore()
+  const userId = (await supabase.auth.getSession()).data.session?.user.id
+  if (userId === undefined) {
+    tasks.value = []
+    return
   }
-
-  const setAllTask = async () => {
-    const { userId } = storeToRefs(useUserStore())
-    const data = await getAllByColumns<Task>('Tasks', [
-      { column: 'userId', value: userId.value }
-    ])
-    if (data) allTasks.value = data
+  const query = supabase
+    .from('Tasks')
+    .select()
+    .match({ userId: userId })
+    .order('created_at', { ascending: false })
+  if (currentCategoryId.value) {
+    query.match({ categoryId: currentCategoryId.value })
   }
-
-  const addTask = async (title: string, categoryId: number, userId: string) => {
-    const data = await createOne<Task>('Tasks', {
-      title,
-      categoryId,
-      userId
-    })
-    if (data) {
-      setTasks(userId)
-      setAllTask()
-    }
+  const { data, error } = await query
+  if (error) {
+    console.error(error)
+    return
   }
+  tasks.value = data
+}
 
-  const updateTask = async (task: CurrentTask) => {
-    if (task.id) {
-      const data = await updateOne<Task>(
-        'Tasks',
-        { title: task.title },
-        task.id
-      )
-      if (data) {
-        tasks.value = tasks.value.map((t) =>
-          t.id === task.id ? { ...t, title: data.title } : t
-        )
-      }
-    }
+const setAllTasks = async () => {
+  const userId = (await supabase.auth.getSession()).data.session?.user.id
+  if (!userId) {
+    allTasks.value = []
+    return
   }
-
-  const editTaskStatus = async (task: Task) => {
-    const data = await updateOne<Task>(
-      'Tasks',
-      { status: !task.status },
-      task.id
-    )
-
-    if (data) {
-      tasks.value = tasks.value.map((t) =>
-        t.id === task.id ? { ...t, status: data.status } : t
-      )
-      setAllTask()
-    }
+  const { data, error } = await supabase
+    .from('Tasks')
+    .select('status')
+    .eq('userId', userId)
+  if (error) {
+    console.error(error)
+    return
   }
+  allTasks.value = data
+}
 
-  const deleteTask = async (id: number) => {
-    const data = await deleteOne<Task>('Tasks', id)
-    if (data) {
-      tasks.value = tasks.value.filter((t) => t.id !== id)
-      setAllTask()
-    }
+const addTask = async (title: string, categoryId: number, userId: string) => {
+  const { error } = await supabase
+    .from('Tasks')
+    .insert({ title, categoryId, userId })
+  if (error) {
+    console.error(error)
+    return
   }
+  setTasks()
+  setAllTasks()
+}
+
+const updateTask = async (task: TablesUpdate<'Tasks'> & { id: number }) => {
+  const { data, error } = await supabase
+    .from('Tasks')
+    .update(task)
+    .eq('id', task.id)
+    .select()
+    .single()
+  if (error) {
+    console.error(error)
+    return
+  }
+  tasks.value = tasks.value.map((t) => (t.id === task.id ? data : t))
+  if ('status' in task) {
+    setAllTasks()
+  }
+}
+
+const deleteTask = async (id: number) => {
+  const { error } = await supabase.from('Tasks').delete().eq('id', id)
+  if (error) {
+    console.error(error)
+    return
+  }
+  tasks.value = tasks.value.filter((t) => t.id !== id)
+  setAllTasks()
+}
+
+export const useTasksStore = () => {
   return {
     tasks,
     allTasks,
-    completedTasks,
-    notCompletedTasks,
+    setAllTasks,
     setTasks,
-    setAllTask,
     addTask,
     updateTask,
-    editTaskStatus,
     deleteTask
   }
-})
+}

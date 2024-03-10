@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supabase'
-import SettingSVG from '@/assets/icons/settings.svg?component'
+import { supabase } from '@/db/supabase'
 import Settings from '@/components/Settings.vue'
+import SettingSvg from '@/assets/icons/settings.svg?component'
 
 const router = useRouter()
 
@@ -19,11 +19,19 @@ const setShowSettings = () => {
 </script>
 
 <template>
-  <div v-if="$route.name !== 'Auth'" class="mb-8 pt-10">
+  <div
+    v-if="$route.name !== 'Auth'"
+    class="mb-8 pt-10"
+  >
     <div class="container">
-      <div class="header">
+      <nav>
         <div>
-          <button class="cbtn" @click="signOut">выйти</button>
+          <button
+            class="cbtn"
+            @click="signOut"
+          >
+            выйти
+          </button>
         </div>
         <div>
           <router-link :to="{ name: 'Profile' }">
@@ -35,14 +43,18 @@ const setShowSettings = () => {
             <button class="cbtn">задачи</button>
           </router-link>
         </div>
-
-        <SettingSVG @click="setShowSettings" />
-      </div>
+        <setting-svg @click="setShowSettings" />
+      </nav>
     </div>
   </div>
-  <transition name="settings">
-    <Settings v-if="showSettings" :set-close-settings="setShowSettings" />
-  </transition>
+  <Teleport to="body">
+    <Transition name="settings">
+      <Settings
+        v-if="showSettings"
+        @close="setShowSettings"
+      />
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped lang="sass">
@@ -56,7 +68,7 @@ const setShowSettings = () => {
   &:hover
     transform: rotate(180deg) scale(1.1)
 
-.header
+nav
   display: flex
   gap: 10px
 
